@@ -2,6 +2,12 @@ api_platform:
     title: Hello API Platform
     version: 1.0.0
     defaults:
-        stateless: true
+        stateless: false
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
+    # set up the swagger configuration
+    swagger:
+        api_keys:
+            access_token:
+                name: Authorization
+                type: header

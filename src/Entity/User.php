@@ -71,11 +71,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Order::class, mappedBy: 'ownedBy', orphanRemoval: true)]
     private Collection $orders;
 
+    /**
+     * @var Collection<int, ApiToken>
+     */
+    #[ORM\OneToMany(targetEntity: ApiToken::class, mappedBy: 'owner')]
+    private Collection $apiTokens;
+
     public function __construct()
     {
         $this->carts = new ArrayCollection();
         $this->shippingAddresses = new ArrayCollection();
         $this->orders = new ArrayCollection();
+        $this->apiTokens = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -196,7 +203,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isAccountActiveStatus(): ?bool
+    public function getAccountActiveStatus(): ?bool
     {
         return $this->accountActiveStatus;
     }
@@ -208,7 +215,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isVerificationStatus(): ?bool
+    public function getVerificationStatus(): ?bool
     {
         return $this->verificationStatus;
     }
@@ -316,6 +323,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($order->getOwnedBy() === $this) {
                 $order->setOwnedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ApiToken>
+     */
+    public function getApiTokens(): Collection
+    {
+        return $this->apiTokens;
+    }
+
+    public function addApiToken(ApiToken $apiToken): static
+    {
+        if (!$this->apiTokens->contains($apiToken)) {
+            $this->apiTokens->add($apiToken);
+            $apiToken->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeApiToken(ApiToken $apiToken): static
+    {
+        if ($this->apiTokens->removeElement($apiToken)) {
+            // set the owning side to null (unless already changed)
+            if ($apiToken->getOwner() === $this) {
+                $apiToken->setOwner(null);
             }
         }
 
