@@ -7,6 +7,7 @@ namespace App\Security;
 use App\Entity\ApiToken;
 use App\Repository\ApiTokenRepository;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 
@@ -25,6 +26,11 @@ class ApiTokenHandler implements AccessTokenHandlerInterface
 
         if ( ! $apiToken ) {
             throw new AuthenticationException('Invalid token');
+        }
+
+        // check for the token validity
+        if ( ! $apiToken->isValid() ) {
+            throw new CustomUserMessageAuthenticationException('Invalid token');
         }
         
         // get the owner from the token

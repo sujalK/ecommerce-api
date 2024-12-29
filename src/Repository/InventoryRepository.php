@@ -16,6 +16,15 @@ class InventoryRepository extends ServiceEntityRepository
         parent::__construct($registry, Inventory::class);
     }
 
+    public function findByProductId(int $productId): ?Inventory
+    {
+        return $this->createQueryBuilder('i')
+                    ->andWhere('i.product = :productId')
+                    ->setParameter('productId', $productId)
+                    ->getQuery()
+                    ->getOneOrNullResult();
+    }
+
     //    /**
     //     * @return Inventory[] Returns an array of Inventory objects
     //     */

@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\InventoryRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: InventoryRepository::class)]
@@ -26,10 +24,6 @@ class Inventory
 
     #[ORM\ManyToOne(inversedBy: 'inventories')]
     private ?Product $product = null;
-
-    public function __construct()
-    {
-    }
 
     public function getId(): ?int
     {

@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Make Payment</h1>
+    <p>T-Shirt</p>
+
+    <!-- Add a button to start the payment process -->
+    <button id="checkout-button">Pay Now</button>
+{% endblock %}
+
+{% block js %}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  // Your public Stripe API key (replace with your key)
+  const stripe = Stripe('pk_test_51QX3MEJ8cBprh1gRA88XXm1xpawqUrKPGKKclNDqAOPgtZkEpZpaM42Xxn4srUEHaoIS8yGGIQSER7pl5mda7MDM00PYaSgaOS');
+
+  // Listen for click on the checkout button
+  document.getElementById('checkout-button').addEventListener('click', async () => {
+
+    const user = await fetch('/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: 'sujal@gmail.com',
+        password: '123',
+      })
+    });
+
+    const userData = await user.json();
+    const token    = userData.token;
+
+    // Fetch the session ID from your server
+    const response = await fetch('/api/payments', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/ld+json',
+        // 'Authorization': 'Bearer ' + token,
+      },
+      body: JSON.stringify({
+        // lineItems: [
+        //   { name: 'T-Shirt', quantity: 1, unit_amount: 2000 },
+        //   { name: 'Chocolate', quantity: 2, unit_amount: 700 }
+        // ]
+      })
+    });
+
+    // if the response is not ok, then return ( exit out ) from this function
+    if ( ! response.ok ) {
+      return;
+    }
+
+    const session = await response.json();
+
+    // Redirect to Stripe Checkout with the session ID
+    const result = await stripe.redirectToCheckout({ sessionId: session.stripeSessionId });
+
+    if (result.error) {
+      console.error(result.error.message);
+    }
+  });
+</script>
+{% endblock %}

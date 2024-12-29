@@ -34,11 +34,8 @@ class Cart
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $couponCode = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
     private ?string $totalPrice = null;
-
-    #[ORM\Column(length: 10)]
-    private ?string $currency = null;
 
     /**
      * @var Collection<int, CartItem>
@@ -46,8 +43,12 @@ class Cart
     #[ORM\OneToMany(targetEntity: CartItem::class, mappedBy: 'cart', orphanRemoval: true)]
     private Collection $cartItems;
 
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    private ?string $totalPriceAfterDiscount = null;
+
     public function __construct()
     {
+        $this->createdAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
         $this->cartItems = new ArrayCollection();
     }
 
@@ -128,18 +129,6 @@ class Cart
         return $this;
     }
 
-    public function getCurrency(): ?string
-    {
-        return $this->currency;
-    }
-
-    public function setCurrency(string $currency): static
-    {
-        $this->currency = $currency;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, CartItem>
      */
@@ -166,6 +155,18 @@ class Cart
                 $cartItem->setCart(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTotalPriceAfterDiscount(): ?string
+    {
+        return $this->totalPriceAfterDiscount;
+    }
+
+    public function setTotalPriceAfterDiscount(?string $totalPriceAfterDiscount): static
+    {
+        $this->totalPriceAfterDiscount = $totalPriceAfterDiscount;
 
         return $this;
     }

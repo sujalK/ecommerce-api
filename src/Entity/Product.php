@@ -57,6 +57,7 @@ class Product
 
     public function __construct()
     {
+        $this->createdAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
         $this->cartItems = new ArrayCollection();
         $this->inventories = new ArrayCollection();
     }
@@ -155,7 +156,7 @@ class Product
         return $this->isActive;
     }
 
-    public function setActive(bool $isActive): static
+    public function setIsActive(bool $isActive): static
     {
         $this->isActive = $isActive;
 

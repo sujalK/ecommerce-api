@@ -56,6 +56,7 @@ class ShippingAddress
 
     public function __construct()
     {
+        $this->createdAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
         $this->orders = new ArrayCollection();
     }
 

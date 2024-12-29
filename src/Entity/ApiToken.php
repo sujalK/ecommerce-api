@@ -48,7 +48,8 @@ class ApiToken
 
     public function __construct(string $accessTokenTypePrefix = self::ECOMMERCE_PERSONAL_ACCESS_TOKEN_PREFIX)
     {
-        $this->token = $accessTokenTypePrefix.bin2hex(random_bytes(32));
+        $this->createdAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $this->token     = $accessTokenTypePrefix.bin2hex(random_bytes(32));
     }
 
     public function getId(): ?int
@@ -114,5 +115,10 @@ class ApiToken
         $this->expiresAt = $expiresAt;
 
         return $this;
+    }
+
+    public function isValid(): bool
+    {
+        return $this->expiresAt === null || $this->expiresAt > new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
     }
 }

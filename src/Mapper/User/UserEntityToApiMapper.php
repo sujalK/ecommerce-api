@@ -2,9 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace App\Mapper;
+namespace App\Mapper\User;
 
-use App\ApiResource\UserApi;
+use App\ApiResource\User\UserApi;
 use App\Entity\User;
 use Symfonycasts\MicroMapper\AsMapper;
 use Symfonycasts\MicroMapper\MapperInterface;

@@ -16,6 +16,17 @@ class PaymentRepository extends ServiceEntityRepository
         parent::__construct($registry, Payment::class);
     }
 
+    public function findByOrderId(int $orderId): ?Payment
+    {
+        return $this->createQueryBuilder('p')
+                    ->andWhere('p.order = :orderId')
+                    ->setParameter('orderId', $orderId)
+                    ->orderBy('p.id', 'DESC')
+                    ->setMaxResults(1)
+                    ->getQuery()
+                    ->getOneOrNullResult();
+    }
+
 //    /**
 //     * @return Payment[] Returns an array of Payment objects
 //     */

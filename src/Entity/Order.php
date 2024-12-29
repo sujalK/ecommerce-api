@@ -50,6 +50,14 @@ class Order
     #[ORM\JoinColumn(nullable: false)]
     private ?ShippingMethod $shippingMethod = null;
 
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    private ?string $totalPriceAfterDiscount = null;
+    
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -171,6 +179,18 @@ class Order
     public function setShippingMethod(?ShippingMethod $shippingMethod): static
     {
         $this->shippingMethod = $shippingMethod;
+
+        return $this;
+    }
+
+    public function getTotalPriceAfterDiscount(): ?string
+    {
+        return $this->totalPriceAfterDiscount;
+    }
+
+    public function setTotalPriceAfterDiscount(?string $totalPriceAfterDiscount): static
+    {
+        $this->totalPriceAfterDiscount = $totalPriceAfterDiscount;
 
         return $this;
     }

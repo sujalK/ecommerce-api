@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Success</title>
+</head>
+<body>
+    <h1>Payment Successful!</h1>
+    <p>Thank you for your payment. Your transaction was successful.</p>
+    <p>Transaction ID: {{ session.payment_intent }}</p>
+    <p>Amount: ${{ session.amount_total / 100 }}</p>
+</body>
+</html>

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Entity;
 
 use App\Repository\CouponRepository;
@@ -23,7 +25,7 @@ class Coupon
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $discountValue = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 2, nullable: true)]
     private ?string $maxDiscountAmountForPercentage = null;
 
     #[ORM\Column]

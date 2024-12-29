@@ -16,7 +16,7 @@ class OrderItem
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Order $parentOrder = null;
+    private ?Order $order = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -40,19 +40,24 @@ class OrderItem
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    public function __construct()
+    {
+        $this->createdAt = (new \DateTime('now'))->format('Y-m-d\TH:i:sP');
+    }
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getParentOrder(): ?Order
+    public function getOrder(): ?Order
     {
-        return $this->parentOrder;
+        return $this->order;
     }
 
-    public function setParentOrder(?Order $parentOrder): static
+    public function setOrder(?Order $order): static
     {
-        $this->parentOrder = $parentOrder;
+        $this->order = $order;
 
         return $this;
     }

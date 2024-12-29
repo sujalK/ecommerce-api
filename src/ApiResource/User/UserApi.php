@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace App\ApiResource;
+namespace App\ApiResource\User;
 
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiProperty;
@@ -23,10 +23,10 @@ use Symfony\Component\Validator\Constraints as Assert;
     description: 'Api Resource that belongs to User',
     operations: [
         new Get(
-            security: 'is_granted("ROLE_USER_FETCH")'
+            security: 'is_granted("ROLE_USER_READ")'
         ),
         new GetCollection(
-            security: 'is_granted("ROLE_USER_FETCH")'
+            security: 'is_granted("ROLE_USER_READ")'
         ),
         new Post (
             security: 'is_granted("PUBLIC_ACCESS")',

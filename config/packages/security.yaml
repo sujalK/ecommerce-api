@@ -1,7 +1,24 @@
 security:
     role_hierarchy:
-        ROLE_FULL_USER: [ROLE_USER_EDIT, ROLE_USER_DELETE, ROLE_USER_FETCH]
-        ROLE_ADMIN:     [ROLE_FULL_USER]
+        # works as protected roles ( only for admin user and for the users assigned by the admin )
+        ROLE_USER_ACCESS:    [ROLE_USER_READ, ROLE_USER_EDIT, ROLE_USER_DELETE]
+        ROLE_PRODUCT_ACCESS: [ROLE_PRODUCT_CREATE, ROLE_PRODUCT_EDIT, ROLE_PRODUCT_DELETE]
+        ROLE_COUPON_ACCESS:  [ROLE_COUPON_GET, ROLE_COUPON_COLLECTION_GET, ROLE_COUPON_CREATE, ROLE_COUPON_EDIT, ROLE_COUPON_DELETE]
+
+        # ROLES intended for token-based user ( i.e. PUBLIC-User access ), because they need cart access for adding items, reading cart data, and editing the cart
+        ROLE_CART_ACCESS:    [ROLE_CART_READ, ROLE_CART_ADD, ROLE_CART_EDIT]
+
+        # ROLE INTENDED FOR TOKEN BASED USER ( if we give them, they can perform tasks )
+        ROLE_TOKEN_BASED_USER: [ROLE_CART_ACCESS]
+
+        # standard login: Roles when user authenticates without their access token
+        ROLE_FULL_USER: [ROLE_TOKEN_BASED_USER]
+
+        # Admin assigned user can do all the thing admin can do
+        ROLE_ADMIN_ASSIGNED_USER: [ROLE_FULL_USER, ROLE_USER_ACCESS, ROLE_PRODUCT_ACCESS, ROLE_COUPON_ACCESS]
+
+        # Admins are allowed to perform all the actions
+        ROLE_ADMIN: [ROLE_ADMIN_ASSIGNED_USER]
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
@@ -19,6 +36,14 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+
+            logout: true
+
+            # json login
+            json_login:
+                check_path: app_login
+                username_path: email
+                password_path: password
 
             # access token authenticator
             access_token:

@@ -19,6 +19,30 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+    App\State\PaymentProcessor:
+        arguments:
+            $stripeSecretKey: '%env(STRIPE_SECRET_KEY)%'
+    App\Service\Stripe\StripeClientService:
+        arguments:
+            $apiSecretKey: '%env(STRIPE_SECRET_KEY)%'
+
+    App\EventListener\ExceptionListener:
+        tags:
+            - { name: 'kernel.event_listener', event: 'kernel.exception', priority: 20000 }
+
+#    Symfonycasts\MicroMapper\MicroMapper:
+#        # Additional configuration if necessary
+#        autowire: true
+#
+#    # register DataMapperInterface
+#    Symfonycasts\MicroMapper\MicroMapperInterface: '@Symfonycasts\MicroMapper\MicroMapper'
+#
+#    App\Contracts\DataMapperInterface:
+#        class: 'App\Wrapper\DataMapperWrapper'
+#        arguments:
+#            - '@Symfonycasts\MicroMapper\MicroMapper'
+
+
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

@@ -17,40 +17,46 @@ class Payment
     private ?int $id = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Order $orderRelation = null;
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Order $order = null;
 
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 50, nullable: true)]
     private ?string $paymentMethod = null;
 
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $paymentStatus = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
     private ?string $amount = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $paymentDate = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $transactionId = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $billingAddress = null;
+
+    #[ORM\Column]
+    private array $lineItems = [];
+
+    #[ORM\Column(length: 255)]
+    private ?string $stripeSessionId = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getOrderRelation(): ?Order
+    public function getOrder(): ?Order
     {
-        return $this->orderRelation;
+        return $this->order;
     }
 
-    public function setOrderRelation(Order $orderRelation): static
+    public function setOrder(Order $order): static
     {
-        $this->orderRelation = $orderRelation;
+        $this->order = $order;
 
         return $this;
     }
@@ -123,6 +129,30 @@ class Payment
     public function setBillingAddress(?string $billingAddress): static
     {
         $this->billingAddress = $billingAddress;
+
+        return $this;
+    }
+
+    public function getLineItems(): array
+    {
+        return $this->lineItems;
+    }
+
+    public function setLineItems(array $lineItems): static
+    {
+        $this->lineItems = $lineItems;
+
+        return $this;
+    }
+
+    public function getStripeSessionId(): ?string
+    {
+        return $this->stripeSessionId;
+    }
+
+    public function setStripeSessionId(string $stripeSessionId): static
+    {
+        $this->stripeSessionId = $stripeSessionId;
 
         return $this;
     }
