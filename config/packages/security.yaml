@@ -11,7 +11,7 @@ security:
         # ROLE INTENDED FOR TOKEN BASED USER ( if we give them, they can perform tasks )
         ROLE_TOKEN_BASED_USER: [ROLE_CART_ACCESS]
 
-        # standard login: Roles when user authenticates without their access token
+        # standard login: Roles when user authenticates without their access token ( i.e. using username and password )
         ROLE_FULL_USER: [ROLE_TOKEN_BASED_USER]
 
         # Admin assigned user can do all the thing admin can do

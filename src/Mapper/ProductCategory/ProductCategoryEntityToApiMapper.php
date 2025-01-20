@@ -45,12 +45,13 @@ class ProductCategoryEntityToApiMapper implements MapperInterface
         $dto->categoryName = $entity->getCategoryName();
         $dto->description  = $entity->getDescription();
 
+        /** Commented out the products[] for the specific category */
         // Product[] -> ProductApi[]
-        $dto->products     = array_map(static function(Product $product) {
-            return $this->microMapper->map($product, ProductApi::class, [
-                MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
-        }, $entity->getProducts());
+//        $dto->products     = array_map(function(Product $product) {
+//            return $this->microMapper->map($product, ProductApi::class, [
+//                MicroMapperInterface::MAX_DEPTH => 0,
+//            ]);
+//        }, $entity->getProducts()->getValues());
 
         return $dto;
     }

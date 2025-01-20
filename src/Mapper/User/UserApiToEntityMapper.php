@@ -57,6 +57,7 @@ class UserApiToEntityMapper implements MapperInterface
         $entity->setFirstName($dto->firstName);
         $entity->setLastName($dto->lastName);
         $entity->setAccountActiveStatus($dto->accountActiveStatus);
+        $entity->setVerificationStatus($dto->verificationStatus);
 
         // TODO: $carts, $shippingAddresses, $orders
 

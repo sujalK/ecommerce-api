@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     description: 'Api Resource that belongs to User',
     operations: [
         new Get(
-            security: 'is_granted("ROLE_USER_READ")'
+            //security: 'is_granted("ROLE_USER_READ")'
         ),
         new GetCollection(
             security: 'is_granted("ROLE_USER_READ")'
@@ -33,14 +33,14 @@ use Symfony\Component\Validator\Constraints as Assert;
             validationContext: ['groups' => ['Default', 'postValidation']]
         ),
         new Patch(
-            security: 'is_granted("ROLE_USER_EDIT")'
+            // security: 'is_granted("ROLE_USER_EDIT")'
         ),
         new Delete(
             security: 'is_granted("ROLE_USER_DELETE")'
         ),
     ],
     paginationItemsPerPage: 5,
-    security: 'is_granted("ROLE_USER")',
+    // security: 'is_granted("ROLE_USER")',
     provider: EntityToDtoStateProvider::class,
     processor: DtoToEntityStateProcessor::class,
     stateOptions: new Options(entityClass: User::class),

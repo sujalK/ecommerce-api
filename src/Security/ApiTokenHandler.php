@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace App\Security;
 
-use App\Entity\ApiToken;
 use App\Repository\ApiTokenRepository;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;

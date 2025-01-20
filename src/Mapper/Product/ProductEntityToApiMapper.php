@@ -4,13 +4,11 @@ declare(strict_types = 1);
 
 namespace App\Mapper\Product;
 
-use App\ApiResource\Cart\CartApi;
-use App\ApiResource\Inventory\InventoryApi;
 use App\ApiResource\Product\ProductApi;
 use App\ApiResource\ProductCategory\ProductCategoryApi;
-use App\Entity\Cart;
-use App\Entity\Inventory;
+use App\Contracts\EnvironmentVariablesServiceInterface;
 use App\Entity\Product;
+use App\Enum\EnvVars;
 use Symfonycasts\MicroMapper\AsMapper;
 use Symfonycasts\MicroMapper\MapperInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
@@ -21,6 +19,7 @@ class ProductEntityToApiMapper implements MapperInterface
 
     public function __construct (
         private readonly MicroMapperInterface $microMapper,
+        private readonly EnvironmentVariablesServiceInterface $environmentVariablesService,
     )
     {
     }
@@ -49,28 +48,30 @@ class ProductEntityToApiMapper implements MapperInterface
         $dto->description = $entity->getDescription();
         $dto->price       = $entity->getPrice();
 
-        // TODO: GET the image url after uploading the image
-        $dto->image_url   = $entity->getImageUrl();
-
         $dto->category    = $this->microMapper->map($entity->getCategory(), ProductCategoryApi::class, [
             MicroMapperInterface::MAX_DEPTH => 0,
         ]);
 
         $dto->createdAt   = $entity->getCreatedAt();
-        $dto->updatedAt   = $entity->getUpdatedAt();
         $dto->isActive    = $entity->isActive();
-        $dto->cartItems   = array_map(function(Cart $cart) {
-            return $this->microMapper->map($cart, CartApi::class, [
-                MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
-        }, $entity->getCartItems()->getValues());
+        $dto->s3FileName  = $entity->getS3FileName();
 
-        // Inventory[] -> InventoryApi[]
-        $dto->inventories = array_map(function(Inventory $inventory) {
-            return $this->microMapper->map($inventory, InventoryApi::class, [
-                MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
-        }, $entity->getInventories()->getValues());
+        /** Commented out the cartItems and Inventories */
+
+//        $dto->cartItems   = array_map(function(Cart $cart) {
+//            return $this->microMapper->map($cart, CartApi::class, [
+//                MicroMapperInterface::MAX_DEPTH => 0,
+//            ]);
+//        }, $entity->getCartItems()->getValues());
+//
+//        // Inventory[] -> InventoryApi[]
+//        $dto->inventories = array_map(function(Inventory $inventory) {
+//            return $this->microMapper->map($inventory, InventoryApi::class, [
+//                MicroMapperInterface::MAX_DEPTH => 0,
+//            ]);
+//        }, $entity->getInventories()->getValues());
+
+        $dto->productImage = $entity->getProductImage($this->environmentVariablesService->get(EnvVars::BUCKET_NAME), $this->environmentVariablesService->get(EnvVars::REGION));
 
         return $dto;
     }

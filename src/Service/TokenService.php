@@ -10,7 +10,7 @@ use App\Entity\ApiToken;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 
-class TokenServiceService implements TokenCreationServiceInterface
+class TokenService implements TokenCreationServiceInterface
 {
 
     public function __construct (

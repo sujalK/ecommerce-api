@@ -10,10 +10,9 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
+use App\ApiResource\CartItem\CartItemApi;
 use App\ApiResource\User\UserApi;
 use App\Entity\Cart;
-use App\Entity\CartItem;
 use App\State\EntityToDtoStateProvider;
 
 #[ApiResource (
@@ -52,7 +51,7 @@ class CartApi
     public ?string $couponCode              = null;
 
     /**
-     * @var CartItem[]
+     * @var CartItemApi[]
      */
     #[ApiProperty(readable: true, writable: false)]
     public ?array $cartItems                = null;

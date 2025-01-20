@@ -55,9 +55,6 @@ class ProductApiToEntityMapper implements MapperInterface
         $entity->setDescription($dto->description);
         $entity->setPrice($dto->price);
 
-        // WILL NEED TO IMPLEMENT USING S3
-        $entity->setImageUrl($dto->image_url);
-
         $entity->setCategory(
             $this->microMapper->map($dto->category, ProductCategory::class, [
                 MicroMapperInterface::MAX_DEPTH => 0,
@@ -68,28 +65,28 @@ class ProductApiToEntityMapper implements MapperInterface
             $entity->setCreatedAt($dto->createdAt);
         }
 
-        if ( $dto->id && $dto->updatedAt ) {
+        if ( $dto->updatedAt ) {
             $entity->setUpdatedAt($dto->updatedAt);
         }
 
         $entity->setIsActive($dto->isActive);
 
         // set cartItems
-        $cartItemEntities = [];
-        foreach ( $dto->cartItems as $cartItemApi ) {
-            $cartItemEntities[] = $this->microMapper->map($cartItemApi, CartItem::class, [
-                MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
-        }
-        $this->propertyAccessor->setValue($entity, 'cartItems', $cartItemEntities);
+//        $cartItemEntities = [];
+//        foreach ( $dto->cartItems as $cartItemApi ) {
+//            $cartItemEntities[] = $this->microMapper->map($cartItemApi, CartItem::class, [
+//                MicroMapperInterface::MAX_DEPTH => 0,
+//            ]);
+//        }
+//        $this->propertyAccessor->setValue($entity, 'cartItems', $cartItemEntities);
 
         // set inventories
-        $inventoriesEntities = array_map(function(InventoryApi $inventoryApi) {
-            return $this->microMapper->map($inventoryApi, Inventory::class, [
-                MicroMapperInterface::MAX_DEPTH => 0,
-            ]);
-        }, $dto->inventories);
-        $this->propertyAccessor->setValue($entity, 'inventories', $inventoriesEntities);
+//        $inventoriesEntities = array_map(function(InventoryApi $inventoryApi) {
+//            return $this->microMapper->map($inventoryApi, Inventory::class, [
+//                MicroMapperInterface::MAX_DEPTH => 0,
+//            ]);
+//        }, $dto->inventories);
+//        $this->propertyAccessor->setValue($entity, 'inventories', $inventoriesEntities);
 
         return $entity;
     }

@@ -16,6 +16,12 @@ class ProductRepository extends ServiceEntityRepository
         parent::__construct($registry, Product::class);
     }
 
+//    public function getProduct()
+//    {
+//        $this->createQueryBuilder('p')
+//             ->select('p.s3FileName');
+//    }
+
     //    /**
     //     * @return Product[] Returns an array of Product objects
     //     */

@@ -27,15 +27,12 @@ class Product
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $price = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $image_url = null;
-
     #[ORM\ManyToOne(inversedBy: 'products')]
     #[ORM\JoinColumn(nullable: false)]
     private ?ProductCategory $category = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?\DateTimeImmutable $createdAt;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
@@ -54,6 +51,12 @@ class Product
      */
     #[ORM\OneToMany(targetEntity: Inventory::class, mappedBy: 'product')]
     private Collection $inventories;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $originalFileName = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $s3FileName = null;
 
     public function __construct()
     {
@@ -99,18 +102,6 @@ class Product
     public function setPrice(string $price): static
     {
         $this->price = $price;
-
-        return $this;
-    }
-
-    public function getImageUrl(): ?string
-    {
-        return $this->image_url;
-    }
-
-    public function setImageUrl(?string $image_url): static
-    {
-        $this->image_url = $image_url;
 
         return $this;
     }
@@ -221,6 +212,35 @@ class Product
         }
 
         return $this;
+    }
+
+    public function getOriginalFileName(): ?string
+    {
+        return $this->originalFileName;
+    }
+
+    public function setOriginalFileName(?string $originalFileName): static
+    {
+        $this->originalFileName = $originalFileName;
+
+        return $this;
+    }
+
+    public function getS3FileName(): ?string
+    {
+        return $this->s3FileName;
+    }
+
+    public function setS3FileName(?string $s3FileName): static
+    {
+        $this->s3FileName = $s3FileName;
+
+        return $this;
+    }
+
+    public function getProductImage(string $bucketName, string $region): ?string
+    {
+        return $this->s3FileName ? "https://{$bucketName}.s3.{$region}.amazonaws.com/{$this->getS3FileName()}" : null;
     }
 
 }

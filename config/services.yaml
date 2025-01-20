@@ -4,6 +4,13 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+#    AWS_BUCKET_NAME: '%env(AWS_BUCKET_NAME)%'
+#    AWS_REGION: '%env(AWS_REGION)%'
+    aws.bucket_name: '%env(AWS_BUCKET_NAME)%'
+    aws.region: '%env(AWS_REGION)%'
+
+    upload_max_filesize: '%env(int:UPLOAD_MAX_FILESIZE)%'
+    upload_max_filesize_admin: '%env(int:UPLOAD_MAX_FILESIZE_ADMIN)%'
 
 services:
     # default configuration for services in *this* file
@@ -30,19 +37,42 @@ services:
         tags:
             - { name: 'kernel.event_listener', event: 'kernel.exception', priority: 20000 }
 
-#    Symfonycasts\MicroMapper\MicroMapper:
-#        # Additional configuration if necessary
-#        autowire: true
-#
-#    # register DataMapperInterface
-#    Symfonycasts\MicroMapper\MicroMapperInterface: '@Symfonycasts\MicroMapper\MicroMapper'
-#
-#    App\Contracts\DataMapperInterface:
-#        class: 'App\Wrapper\DataMapperWrapper'
-#        arguments:
-#            - '@Symfonycasts\MicroMapper\MicroMapper'
+    # Custom controllers for Product
+    App\Controller\CreateProductController:
+        tags: [ 'controller.service_arguments' ]
 
+    App\Controller\ProductImagePatchController:
+        tags: [ 'controller.service_arguments' ]
 
+    App\Service\Product\Patch\ProductImageUpdateService:
+        tags: [ 'controller.service_arguments' ]
 
+    Aws\S3\S3Client:
+        arguments:
+            -
+                version: 'latest'
+                region: '%env(AWS_REGION)%'
+                credentials:
+                    key: '%env(AWS_ACCESS_KEY_ID)%'
+                    secret: '%env(AWS_SECRET_ACCESS_KEY)%'
+
+    App\Service\S3UploadService:
+        arguments:
+            $s3Client: '@Aws\S3\S3Client'
+            $s3BucketName: '%env(AWS_BUCKET_NAME)%'
+
+    App\Service\UploadFileSizeProvider:
+        arguments:
+            $defaultMaxSize: '%upload_max_filesize%'
+            $adminMaxSize: '%upload_max_filesize_admin%'
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+# custom exception listener that listens for the error
+#    App\EventListener\CustomExceptionListener:
+#        tags:
+#            - { name: kernel.event_listener, event: kernel.exception, priority: 10 }
+
+#    App\ApiPlatform\ExceptionsNormalizer\InvalidDataExceptionNormalizer:
+#        tags:
+#            - { name: 'serializer.normalizer', priority: 2000 }

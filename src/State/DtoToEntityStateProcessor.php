@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 
 class DtoToEntityStateProcessor implements ProcessorInterface

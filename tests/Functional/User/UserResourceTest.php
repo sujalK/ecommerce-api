@@ -20,6 +20,33 @@ class UserResourceTest extends KernelTestCase
     use ResetDatabase;
     use Factories;
 
+    public function testPatchToUpdateUser(): void
+    {
+
+        $user = UserFactory::createOne([
+            'firstName'           => 'firstName',
+            'lastName'            => 'lastName',
+            'username'            => 'smth',
+            'password'            => '123',
+            'email'               => 'smth@gmail.com',
+            'accountActiveStatus' => true,
+            'verificationStatus'  => true,
+        ]);
+
+        $this->browser()
+             ->patch('/api/users/'. $user->getId(), [
+                 'json' =>  [
+                     'firstName'           => 'changed',
+                 ],
+                 'headers' => [
+                     'Content-Type' => 'application/merge-patch+json',
+                     'Accept' => 'application/ld+json'
+                 ]
+             ])
+             ->dump()
+        ;
+    }
+
     public function testGetUserInfoForLoggedInUser(): void
     {
 

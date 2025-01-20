@@ -13,7 +13,7 @@ use App\State\DtoToEntityStateProcessor;
 use App\State\EntityToDtoStateProvider;
 
 #[ApiResource (
-    shortName: 'ProductCategory',
+    shortName: 'Category',
     description: 'Product category',
     provider: EntityToDtoStateProvider::class,
     processor: DtoToEntityStateProcessor::class,
@@ -32,6 +32,6 @@ class ProductCategoryApi
     /**
      * @var ProductApi[]
      */
-    public ?array $products      = null;
+    // public ?array $products      = null;
 
 }
