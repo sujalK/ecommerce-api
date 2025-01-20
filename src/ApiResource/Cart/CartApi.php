@@ -10,10 +10,12 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
 use App\ApiResource\CartItem\CartItemApi;
 use App\ApiResource\User\UserApi;
 use App\Entity\Cart;
 use App\State\EntityToDtoStateProvider;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource (
     shortName: 'Cart',
@@ -24,6 +26,9 @@ use App\State\EntityToDtoStateProvider;
         ),
         new Get (
             security: 'is_granted("VIEW", object)'
+        ),
+        new Post (
+            security: 'is_granted("ADD", object)',
         ),
         new Patch (
             security: 'is_granted("EDIT", object)'
@@ -40,14 +45,20 @@ class CartApi
 
     public ?UserApi $owner                  = null;
 
+    /* cart status, */
     public ?string $status                  = null;
 
     // TODO:
+    #[Assert\Regex(pattern: '/^\d{1,8}(\.\d{1,2})?$/')]
     public ?string $totalPrice              = null;
 
     /**
      * Another endpoint sets up the coupon code for Cart
      */
+    #[Assert\Regex(
+        pattern: '/^[a-zA-Z]+$/',
+        message: 'The value must contain only letters.'
+    )]
     public ?string $couponCode              = null;
 
     /**
