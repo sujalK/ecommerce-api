@@ -27,9 +27,9 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get (
             security: 'is_granted("VIEW", object)'
         ),
-        new Post (
-            security: 'is_granted("ADD", object)',
-        ),
+//        new Post (
+//            security: 'is_granted("ADD", object)',
+//        ),
         new Patch (
             security: 'is_granted("EDIT", object)'
         ),
