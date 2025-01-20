@@ -10,7 +10,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
 use App\ApiResource\CartItem\CartItemApi;
 use App\ApiResource\User\UserApi;
 use App\Entity\Cart;
@@ -22,9 +21,11 @@ use Symfony\Component\Validator\Constraints as Assert;
     description: 'Cart of a user',
     operations: [
         new GetCollection(
+            // we only allow admins to see all the carts (list of carts) because GET operation can view the cart for a single user
             security: 'is_granted("ROLE_ADMIN")'
         ),
         new Get (
+            // GET the single cart, and cart lists all cart Items associated to the cart
             security: 'is_granted("VIEW", object)'
         ),
 //        new Post (
@@ -34,6 +35,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             security: 'is_granted("EDIT", object)'
         ),
     ],
+    paginationItemsPerPage: 10,
     provider: EntityToDtoStateProvider::class,
     stateOptions: new Options(entityClass: Cart::class)
 )]

@@ -30,7 +30,7 @@ class CartItemResourceTest extends KernelTestCase
         ]);
 
         InventoryFactory::createOne([
-            'product' => $product,
+            'product'             => $product,
             'quantityInStock'     => 200,
             'quantitySold'        => 10,
             'quantityBackOrdered' => 10,

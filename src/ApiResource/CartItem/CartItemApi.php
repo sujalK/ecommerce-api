@@ -14,6 +14,7 @@ use ApiPlatform\Metadata\Post;
 use App\ApiResource\Cart\CartApi;
 use App\ApiResource\Product\ProductApi;
 use App\State\CartItemStateProcessor;
+use App\State\DeleteCartItemProcessor;
 use App\State\EntityToDtoStateProvider;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -31,7 +32,10 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/carts',
             processor: CartItemStateProcessor::class
         ),
-        new Delete(),
+        new Delete (
+            security: 'is_granted("DELETE", object)',
+            processor: DeleteCartItemProcessor::class,
+        ),
     ],
     formats: [
         'json' => 'application/json',
