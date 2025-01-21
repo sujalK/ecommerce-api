@@ -7,6 +7,7 @@ namespace App\Security\Voter;
 use App\ApiResource\CartItem\CartItemApi;
 use App\Entity\User;
 use App\Repository\CartRepository;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -15,9 +16,11 @@ final class CartItemVoter extends Voter
 {
 
     public const DELETE = 'DELETE';
+    public const ROLE_ADMIN = 'ROLE_ADMIN';
 
     public function __construct (
         private readonly CartRepository $repository,
+        private readonly Security $security,
     )
     {
     }
@@ -35,6 +38,11 @@ final class CartItemVoter extends Voter
         // if the user is anonymous, do not grant access
         if (!$user instanceof User) {
             return false;
+        }
+
+        // Grant access for admin to delete cart item
+        if ( $this->security->isGranted(self::ROLE_ADMIN) ) {
+            return true;
         }
 
         assert($subject instanceof CartItemApi);
