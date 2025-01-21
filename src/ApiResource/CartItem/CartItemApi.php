@@ -35,14 +35,14 @@ use Symfony\Component\Validator\Constraints as Assert;
             processor: CartItemStateProcessor::class
         ),
         new Delete (
-            // security: 'is_granted("DELETE", object)',
+            security: 'is_granted("DELETE", object)',
             processor: DeleteCartItemProcessor::class,
         ),
     ],
     formats: [
         'json' => 'application/json',
     ],
-    // security: 'is_granted("ROLE_USER")',
+    security: 'is_granted("ROLE_USER")',
     provider: EntityToDtoStateProvider::class,
     stateOptions: new Options(entityClass: CartItem::class)
 )]
