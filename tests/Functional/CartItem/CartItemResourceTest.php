@@ -5,6 +5,8 @@ declare(strict_types = 1);
 namespace App\Tests\Functional\CartItem;
 
 use App\Factory\ApiTokenFactory;
+use App\Factory\CartFactory;
+use App\Factory\CartItemFactory;
 use App\Factory\InventoryFactory;
 use App\Factory\ProductFactory;
 use App\Factory\UserFactory;
@@ -57,6 +59,50 @@ class CartItemResourceTest extends KernelTestCase
             ->dump()
             ->assertJsonMatches('totalPrice', "200.00")
         ;
+    }
+
+    public function testDeleteToRemoveCartItem(): void
+    {
+
+        $user = UserFactory::createOne([
+            'email' => 'test_user@gmail.com'
+        ]);
+
+        $cart = CartFactory::createOne([
+            'owner'      => $user,
+            'status'     => 'active',
+            'totalPrice' => '400.00',
+        ]);
+
+        $product = ProductFactory::createOne([
+            'price' => 20.00
+        ]);
+
+        $cartItem = CartItemFactory::createOne([
+            'cart'                     => $cart,
+            'product'                  => $product,
+            'quantity'                 => 20,
+            'pricePerUnit'             => $product->getPrice(),
+            'totalPrice'               => $product->getPrice(),
+            'createdAt'                => new \DateTimeImmutable(),
+            'updatedAt'                => new \DateTimeImmutable(),
+            'discountAmount'           => '10',
+            'totalPriceAfterDiscount'  => $product->getPrice(),
+        ]);
+
+        $token = ApiTokenFactory::createOne([
+            'owner' => $user,
+        ]);
+
+        $this->browser()
+             ->delete('/api/cart_items/'. $cartItem->getId(), [
+                 'headers' => [
+                     'Authorization' => 'Bearer '. $token->getToken(),
+                 ]
+             ])
+             ->dump()
+        ;
+
     }
 
 }

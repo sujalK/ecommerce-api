@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\ApiResource\CartItem;
 
+use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -13,6 +14,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\ApiResource\Cart\CartApi;
 use App\ApiResource\Product\ProductApi;
+use App\Entity\CartItem;
 use App\State\CartItemStateProcessor;
 use App\State\DeleteCartItemProcessor;
 use App\State\EntityToDtoStateProvider;
@@ -33,15 +35,16 @@ use Symfony\Component\Validator\Constraints as Assert;
             processor: CartItemStateProcessor::class
         ),
         new Delete (
-            security: 'is_granted("DELETE", object)',
+            // security: 'is_granted("DELETE", object)',
             processor: DeleteCartItemProcessor::class,
         ),
     ],
     formats: [
         'json' => 'application/json',
     ],
-    security: 'is_granted("ROLE_USER")',
+    // security: 'is_granted("ROLE_USER")',
     provider: EntityToDtoStateProvider::class,
+    stateOptions: new Options(entityClass: CartItem::class)
 )]
 class CartItemApi
 {
