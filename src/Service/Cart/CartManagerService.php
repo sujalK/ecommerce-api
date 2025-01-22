@@ -17,10 +17,12 @@ use App\Entity\Inventory;
 use App\Entity\Product;
 use App\Entity\User;
 use App\Enum\CartStatus;
+use App\Exception\InvalidQuantityException;
 use App\Exception\InventoryException\InsufficientStockException;
 use App\Exception\InventoryException\ProductNotFoundException;
 use App\Repository\CartRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 
 class CartManagerService implements CartManagerInterface
@@ -44,11 +46,16 @@ class CartManagerService implements CartManagerInterface
      */
     public function processCartOperation(User $user, CartItemApi $data): array
     {
+        if ($data->quantity <= 0) {
+            throw new InvalidQuantityException();
+        }
+
         [$cart, $cartItem] = $this->initializeCartAndCartItem($user, $data);
 
         $this->mapDataToCartItemApi($data, $cart);
 
-        $this->persistenceService->flush();
+        // TODO: COMMENTED OUT
+        // $this->persistenceService->flush();
 
         $this->assignIdsToCartItemAndCart($data, $cart, $cartItem);
 
@@ -60,8 +67,9 @@ class CartManagerService implements CartManagerInterface
         $cart     = $this->createCart(user: $user, data: $data);
         $cartItem = $this->createCartItem(cart: $cart, data: $data);
 
-        $this->persistenceService->persist($cart);
-        $this->persistenceService->persist($cartItem);
+        // Added part
+        $this->persistenceService->sync($cart);
+        $this->persistenceService->sync($cartItem);
 
         return [$cart, $cartItem];
     }
@@ -73,7 +81,7 @@ class CartManagerService implements CartManagerInterface
         $cart->setOwner($user);
         $cart->setStatus(CartStatus::ACTIVE->value);
         $cart->setCreatedAt(new \DateTimeImmutable('now', $this->dateAndTime->getTimeZone()));
-        $cart->setTotalPrice($this->priceCalculatorService->calculateTotalPrice($data->quantity, $data->product->price));
+        // $cart->setTotalPrice($this->priceCalculatorService->calculateTotalPrice($data->quantity, $data->product->price));
 
         return $cart;
     }
@@ -102,21 +110,31 @@ class CartManagerService implements CartManagerInterface
     {
         $cart->setUpdatedAt(new \DateTimeImmutable('now', $this->dateAndTime->getTimeZone()));
 
-        $cartItem = array_find($cart->getCartItems(), static fn(CartItem $cartItem) => $cartItem->getProduct()->getId() === $data->product->id);
+        $productId = $data->product->id;
+        $cartItem = \array_find($cart->getCartItems()->getValues(), static fn(CartItem $cartItem) => $cartItem->getProduct()->getId() === $productId);
 
         if ( $cartItem ) {
             assert($cartItem instanceof CartItem);
             $newQuantity = $cartItem->getQuantity() + $data->quantity;
-            $this->inventoryService->checkInventory($data->product->id, $newQuantity);
+            $newPrice    = $newQuantity * $cartItem->getPricePerUnit();
+
+            $this->inventoryService->checkInventory($data->product->id, $data->quantity);
+
+            // update cart Item
             $cartItem->setQuantity($newQuantity);
+            $cartItem->setTotalPrice((string) ($newPrice));
+            $cartItem->setUpdatedAt(new \DateTimeImmutable(datetime: 'now', timezone: $this->dateAndTime->getTimeZone()));
+
         } else {
             $this->inventoryService->checkInventory($data->product->id, $data->quantity);
 
             // create non-existing cartItem and map to $cart (existing cart)
             $cartItem = $this->createCartItem($cart, $data);
 
-            $this->persistenceService->persist($cartItem);
         }
+
+        $this->persistenceService->sync($cartItem);
+        $this->persistenceService->sync($cart);
 
         return $cartItem;
     }
@@ -150,6 +168,28 @@ class CartManagerService implements CartManagerInterface
             /** If there is already an existing cart */
             $cartItem = $this->updateExistingCart($cart, $data);
         }
+
+        $quantity     = $data->quantity;
+        $pricePerUnit = $cartItem->getPricePerUnit();
+        $totalPrice   = $cart->getTotalPrice();
+
+        // Calculate total price with precision
+        $newTotalPrice = bcadd((string) $totalPrice, bcmul((string) $quantity, $pricePerUnit, 2), 2);
+
+        $cart->setTotalPrice($newTotalPrice);
+
+        // Update cart totals
+//        $cart->setTotalPrice (
+//            (string)
+//            (
+//                $cart->getTotalPrice() + ($data->quantity * $cartItem->getPricePerUnit())
+//            )
+//        );
+
+
+        $this->persistenceService->sync($cart);
+
+        $this->inventoryService->deductQuantityFromInventory($data->product->id, $data->quantity);
 
         return [$cart, $cartItem];
     }

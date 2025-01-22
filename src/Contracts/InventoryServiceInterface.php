@@ -7,4 +7,6 @@ namespace App\Contracts;
 interface InventoryServiceInterface
 {
     public function checkInventory(int $productId, int $quantity): void;
+
+    public function deductQuantityFromInventory(int $productId, int $newQuantity): void;
 }

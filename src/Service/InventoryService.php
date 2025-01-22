@@ -8,6 +8,7 @@ use App\Contracts\InventoryServiceInterface;
 use App\Entity\Inventory;
 use App\Exception\InventoryException\InsufficientStockException;
 use App\Exception\InventoryException\ProductNotFoundException;
+use App\Repository\InventoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 class InventoryService implements InventoryServiceInterface
@@ -15,6 +16,7 @@ class InventoryService implements InventoryServiceInterface
 
     public function __construct (
         private readonly EntityManagerInterface $entityManager,
+        private readonly InventoryRepository $repository,
     )
     {
     }
@@ -35,5 +37,15 @@ class InventoryService implements InventoryServiceInterface
         if ($inventory->getQuantityInStock() < $quantity) {
             throw new InsufficientStockException('Not enough stock available.');
         }
+    }
+
+    public function deductQuantityFromInventory(int $productId, int $newQuantity): void
+    {
+        $inventory = $this->repository->findByProductId($productId);
+
+        $inventory->setQuantityInStock($inventory->getQuantityInStock() - $newQuantity);
+
+        $this->entityManager->persist($inventory);
+        $this->entityManager->flush();
     }
 }

@@ -16,6 +16,7 @@ final class CartItemVoter extends Voter
 {
 
     public const DELETE = 'DELETE';
+    public const PATCH  = 'PATCH';
     public const ROLE_ADMIN = 'ROLE_ADMIN';
 
     public function __construct (
@@ -27,7 +28,7 @@ final class CartItemVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return in_array($attribute, [self::DELETE])
+        return in_array($attribute, [self::DELETE, self::PATCH])
             && $subject instanceof CartItemApi;
     }
 
@@ -48,23 +49,28 @@ final class CartItemVoter extends Voter
         assert($subject instanceof CartItemApi);
 
         // ... (check conditions and return true to grant permission) ...
-        switch ($attribute) {
-            case self::DELETE:
+        return match ($attribute) {
+            self::DELETE, self::PATCH => $this->isGranted($subject->cart->id),
+            default => false,
+        };
 
-                // Get the CartId
-                $cartId     = $subject->cart->id;
+    }
 
-                // Get the owner of the cart
-                $cartOwner = $this->repository->find($cartId)->getOwner();
+    private function isGranted(int $cartId): bool
+    {
+        $cartOwner = $this->repository->find($cartId)->getOwner();
 
-                // Do not grant access for Delete operation if cart owner id different from the logged-in user
-                if ( $cartOwner !== $user ) {
-                    return false;
-                }
+        return $this->hasAccessToOwner($cartOwner);
+    }
 
-                return true;
+    private function hasAccessToOwner(User $owner): bool
+    {
+        $currentUser = $this->security->getUser();
+
+        if ($owner !== $currentUser) {
+            return false;
         }
 
-        return false;
+        return true;
     }
 }

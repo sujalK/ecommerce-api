@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\Post;
 use App\ApiResource\Cart\CartApi;
 use App\ApiResource\Product\ProductApi;
 use App\Entity\CartItem;
+use App\State\CartItemPatchProcessor;
 use App\State\CartItemStateProcessor;
 use App\State\DeleteCartItemProcessor;
 use App\State\EntityToDtoStateProvider;
@@ -27,12 +28,13 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get(),
         new GetCollection(),
         new Patch (
-            denormalizationContext: [ 'groups' => ['cart_item:patch'] ],
-            validationContext:      [ 'groups' => ['cart_item:patch'] ]
+            security: 'is_granted("PATCH", object)',
+            processor: CartItemPatchProcessor::class,
         ),
         new Post (
             uriTemplate: '/carts',
-            processor: CartItemStateProcessor::class
+            validationContext: ['groups' => ['Default', 'postValidation']],
+            processor: CartItemStateProcessor::class,
         ),
         new Delete (
             security: 'is_granted("DELETE", object)',
@@ -56,9 +58,9 @@ class CartItemApi
     public ?CartApi $cart                   = null;
 
     /**
-     * only product is required when we add item to the cart
+     * only product, and quantity is required when we add item to the cart
      */
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(groups: ['postValidation'])]
     public ?ProductApi $product             = null;
 
     #[Assert\NotBlank]
