@@ -29,7 +29,8 @@ use Symfony\Component\Validator\Constraints as Assert;
         new GetCollection(),
         new Patch (
             security: 'is_granted("PATCH", object)',
-            processor: CartItemPatchProcessor::class,
+            validationContext: ['groups' => ['Default', 'patchValidation']],
+            processor: CartItemPatchProcessor::class
         ),
         new Post (
             uriTemplate: '/carts',
@@ -63,7 +64,7 @@ class CartItemApi
     #[Assert\NotBlank(groups: ['postValidation'])]
     public ?ProductApi $product             = null;
 
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(groups: ['postValidation', 'patchValidation'])]
     public ?int $quantity                   = null;
 
     #[ApiProperty(readable: true, writable: false)]

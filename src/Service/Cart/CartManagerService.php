@@ -13,7 +13,6 @@ use App\Contracts\DateAndTimeInterface;
 use App\Contracts\PriceCalculatorServiceInterface;
 use App\Entity\Cart;
 use App\Entity\CartItem;
-use App\Entity\Inventory;
 use App\Entity\Product;
 use App\Entity\User;
 use App\Enum\CartStatus;
@@ -21,8 +20,6 @@ use App\Exception\InvalidQuantityException;
 use App\Exception\InventoryException\InsufficientStockException;
 use App\Exception\InventoryException\ProductNotFoundException;
 use App\Repository\CartRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 
 class CartManagerService implements CartManagerInterface
@@ -31,7 +28,6 @@ class CartManagerService implements CartManagerInterface
     public function __construct (
         private readonly MicroMapperInterface            $microMapper,
         private readonly DateAndTimeInterface            $dateAndTime,
-        private readonly EntityManagerInterface          $entityManager,
         private readonly CartRepository                  $cartRepository,
         private readonly PersistenceServiceInterface     $persistenceService,
         private readonly PriceCalculatorServiceInterface $priceCalculatorService,
@@ -54,9 +50,6 @@ class CartManagerService implements CartManagerInterface
 
         $this->mapDataToCartItemApi($data, $cart);
 
-        // TODO: COMMENTED OUT
-        // $this->persistenceService->flush();
-
         $this->assignIdsToCartItemAndCart($data, $cart, $cartItem);
 
         return [$cart, $cartItem];
@@ -68,8 +61,8 @@ class CartManagerService implements CartManagerInterface
         $cartItem = $this->createCartItem(cart: $cart, data: $data);
 
         // Added part
-        $this->persistenceService->sync($cart);
-        $this->persistenceService->sync($cartItem);
+        $this->syncWithDB($cart);
+        $this->syncWithDB($cartItem);
 
         return [$cart, $cartItem];
     }
@@ -133,8 +126,8 @@ class CartManagerService implements CartManagerInterface
 
         }
 
-        $this->persistenceService->sync($cartItem);
-        $this->persistenceService->sync($cart);
+        $this->syncWithDB($cartItem);
+        $this->syncWithDB($cart);
 
         return $cartItem;
     }
@@ -169,28 +162,37 @@ class CartManagerService implements CartManagerInterface
             $cartItem = $this->updateExistingCart($cart, $data);
         }
 
-        $quantity     = $data->quantity;
-        $pricePerUnit = $cartItem->getPricePerUnit();
-        $totalPrice   = $cart->getTotalPrice();
+        // update cart table
+        $cart->setTotalPrice($this->getTotalPrice($data, $cartItem, $cart));
 
-        // Calculate total price with precision
-        $newTotalPrice = bcadd((string) $totalPrice, bcmul((string) $quantity, $pricePerUnit, 2), 2);
-
-        $cart->setTotalPrice($newTotalPrice);
-
-        // Update cart totals
-//        $cart->setTotalPrice (
-//            (string)
-//            (
-//                $cart->getTotalPrice() + ($data->quantity * $cartItem->getPricePerUnit())
-//            )
-//        );
-
-
-        $this->persistenceService->sync($cart);
+        // Persist the changes
+        $this->syncWithDB($cart);
 
         $this->inventoryService->deductQuantityFromInventory($data->product->id, $data->quantity);
 
         return [$cart, $cartItem];
     }
+
+    public function getTotalPrice(CartItemApi $data, mixed $cartItem, mixed $cart): string
+    {
+        $quantity     = $data->quantity; // quantity that is being added to the cart
+        $pricePerUnit = (int) $cartItem->getPricePerUnit(); // Get unit price for specific cart item
+        $totalPrice   = $cart->getTotalPrice(); // Get previous cart total
+
+        $totalPriceForProduct = $this->calculateTotalsForProduct($quantity, $pricePerUnit);
+
+        // Calculate total price with precision
+        return bcadd((string)$totalPrice, $totalPriceForProduct, 2);
+    }
+
+    private function syncWithDB(object $object): void
+    {
+        $this->persistenceService->sync($object);
+    }
+
+    private function calculateTotalsForProduct(int $quantity, int $pricePerUnit): string
+    {
+        return bcmul((string)$quantity, (string) $pricePerUnit, 2);
+    }
+
 }

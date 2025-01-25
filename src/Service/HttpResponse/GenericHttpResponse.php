@@ -41,9 +41,9 @@ class GenericHttpResponse implements HttpResponseInterface
         return $this->jsonResponder->createResponse(HttpStatus::UNPROCESSABLE_ENTITY, $textStatus, $errors);
     }
 
-    public function notFoundException(string $textStatus = self::ERROR): JsonResponse
+    public function notFoundException(?string $description = null, string $textStatus = self::ERROR): JsonResponse
     {
-        return $this->jsonResponder->createResponse(HttpStatus::NOT_FOUND, $textStatus);
+        return $this->jsonResponder->createResponse(status: HttpStatus::NOT_FOUND, textStatus: $textStatus, description: $description);
     }
 
     public function invalidArgumentException(string $textStatus = self::ERROR): JsonResponse
@@ -69,5 +69,10 @@ class GenericHttpResponse implements HttpResponseInterface
     public function serverError(array $errors = [], string $textStatus = self::ERROR, ?string $description = null,): JsonResponse
     {
         return $this->jsonResponder->createResponse(status: HttpStatus::INTERNAL_SERVER_ERROR, textStatus: $textStatus, errors: $errors, description: $description);
+    }
+
+    public function invalidDataResponse(string $textStatus = self::ERROR, array $errors = [], ?string $description = null): JsonResponse
+    {
+        return $this->jsonResponder->createresponse(status: HttpStatus::BAD_REQUEST, textStatus: $textStatus, errors: $errors, description: $description);
     }
 }

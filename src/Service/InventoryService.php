@@ -6,6 +6,7 @@ namespace App\Service;
 
 use App\Contracts\InventoryServiceInterface;
 use App\Entity\Inventory;
+use App\Exception\InvalidQuantityException;
 use App\Exception\InventoryException\InsufficientStockException;
 use App\Exception\InventoryException\ProductNotFoundException;
 use App\Repository\InventoryRepository;
@@ -27,6 +28,11 @@ class InventoryService implements InventoryServiceInterface
      */
     public function checkInventory(int $productId, int $quantity): void
     {
+        // Ensure the requested quantity is valid
+        if ($quantity <= 0) {
+            throw new InvalidQuantityException("Requested quantity must be greater than zero.");
+        }
+
         // Query the inventory table to get the current stock
         $inventory = $this->entityManager->getRepository(Inventory::class)->findByProductId($productId);
 
