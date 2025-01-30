@@ -12,4 +12,6 @@ class PriceCalculator implements PriceCalculatorServiceInterface
     {
         return bcmul(num1: (string) $quantity, num2: $unitPrice, scale: 2);
     }
+
+
 }
