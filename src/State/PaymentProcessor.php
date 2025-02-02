@@ -36,8 +36,7 @@ class PaymentProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        // Get the logged-in user
-        /** @var User $user */
+        /** @var User $user Get the logged-in user */
         $user = $this->security->getUser();
 
         // Fetch the order by the owned_by_id (user ID) and order ID
@@ -121,21 +120,91 @@ class PaymentProcessor implements ProcessorInterface
 
     private function getLineItems(object $order, array $orderItems): array
     {
-        $lineItems = [];
-        foreach ($orderItems as $item) {
+//        $lineItems = [];
+//        foreach ($orderItems as $item) {
+//
+//            $name       = $item->getProduct()->getName();
+//            $currency   = $order->getCurrency();
+//            $unitAmount = (int) ($item->getUnitPrice() * 100);
+//            $quantity   = $item->getQuantity();
+//
+//            $lineItems[] = [
+//                'price_data'   => [
+//                    'currency' => $currency, // Use the currency from the order
+//                    'product_data' => [
+//                        'name' => $name, // Assuming you have a related Product entity
+//                    ],
+//                    'unit_amount' => $unitAmount, // Amount in cents
+//                ],
+//                'quantity' => $quantity,
+//            ];
+//        }
+//
+//        return $lineItems;
 
-            $name       = $item->getProduct()->getName();
-            $currency   = $order->getCurrency();
-            $unitAmount = (int) ($item->getUnitPrice() * 100);
-            $quantity   = $item->getQuantity();
+
+//        /** First iterated code ( using bcmath) */
+//        /** Line items */
+//        $lineItems = [];
+//        foreach ($orderItems as $item) {
+//            $name           = $item->getProduct()->getName();
+//            $currency       = $order->getCurrency();
+//            $unitPrice      = (string) $item->getUnitPrice();
+//            $discountAmount = (string) $item->getDiscountAmount();
+//            $quantity       = $item->getQuantity();
+//
+//            // Calculate final price after applying discount using BCMath
+//            $finalPrice = bcsub($unitPrice, $discountAmount, 2);
+//            $finalPrice = max($finalPrice, '0.00'); // Ensure price is never negative
+//
+//            // Convert to cents (Stripe requires the amount in cents)
+//            $unitAmount = bcmul($finalPrice, '100');
+//
+//            $lineItems[] = [
+//                'price_data' => [
+//                    'currency'     => $currency,
+//                    'product_data' => [
+//                        'name' => $name,
+//                    ],
+//                    'unit_amount'  => (int) $unitAmount, // Convert to integer for Stripe
+//                ],
+//                'quantity' => $quantity,
+//            ];
+//        }
+//
+//        return $lineItems;
+
+
+        // Second and final iteration
+        $lineItems = [];
+
+        foreach ($orderItems as $item) {
+            $name           = $item->getProduct()->getName();
+            $currency       = $order->getCurrency();
+            $unitPrice      = (string) $item->getUnitPrice();
+            $discountAmount = $item->getDiscountAmount() !== null ? (string) $item->getDiscountAmount() : '0.00';
+            $quantity       = $item->getQuantity();
+
+            // Apply discount only if it's greater than 0
+            if (bccomp($discountAmount, '0.00', 2) > 0) {
+                $finalPrice = bcsub($unitPrice, $discountAmount, 2);
+            } else {
+                $finalPrice = $unitPrice;
+            }
+
+            // Ensure the final price is not negative
+            $finalPrice = max($finalPrice, '0.00');
+
+            // Convert to cents (Stripe requires the amount in cents)
+            $unitAmount = bcmul($finalPrice, '100');
 
             $lineItems[] = [
-                'price_data'   => [
-                    'currency' => $currency, // Use the currency from the order
+                'price_data' => [
+                    'currency'     => $currency,
                     'product_data' => [
-                        'name' => $name, // Assuming you have a related Product entity
+                        'name' => $name,
                     ],
-                    'unit_amount' => $unitAmount, // Amount in cents
+                    'unit_amount'  => (int) $unitAmount, // Convert to integer for Stripe
                 ],
                 'quantity' => $quantity,
             ];
