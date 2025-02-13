@@ -41,7 +41,7 @@ class ApiToken
     private array $scopes = [];
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private \DateTimeImmutable $createdAt;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $expiresAt = null;

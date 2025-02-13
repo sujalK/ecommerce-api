@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Order;
 use App\Entity\OrderItem;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -14,6 +15,23 @@ class OrderItemRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, OrderItem::class);
+    }
+
+    /**
+     * Find all order items for a specific Order entity.
+     *
+     * @param Order $order
+     * @return OrderItem[]
+     */
+    public function findByOrder(Order $order): array
+    {
+        return $this->createQueryBuilder('oi')
+                    ->andWhere('oi.order = :order')
+                    ->setParameter('order', $order) // Pass the Order entity directly
+                    ->orderBy('oi.id', 'ASC')
+                    ->getQuery()
+                    ->getResult()
+            ;
     }
 
     //    /**

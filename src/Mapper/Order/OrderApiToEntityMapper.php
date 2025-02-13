@@ -73,6 +73,7 @@ class OrderApiToEntityMapper implements MapperInterface
                 MicroMapperInterface::MAX_DEPTH => 0,
             ])
         );
+        $entity->setCurrency($dto->currency);
 
         return $entity;
     }

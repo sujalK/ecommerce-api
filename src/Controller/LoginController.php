@@ -21,7 +21,7 @@ class LoginController extends AbstractController
     }
 
     #[Route(path: '/api/login', name: 'app_login', methods: ['POST'])]
-    public function login(#[CurrentUser] User $user = null): Response
+    public function login(#[CurrentUser] ?User $user = null): Response
     {
 
         if ( ! $user ) {

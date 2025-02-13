@@ -7,8 +7,10 @@ namespace App\Entity;
 use App\Repository\ShippingMethodRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: ShippingMethodRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_SHIPPING_METHOD_NAME', fields: ['name'])]
 class ShippingMethod
 {
     #[ORM\Id]

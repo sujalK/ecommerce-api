@@ -56,6 +56,7 @@ class OrderEntityToApiMapper implements MapperInterface
         $dto->shippingMethod  = $this->microMapper->map($entity->getShippingMethod(), ShippingMethodApi::class, [
             MicroMapperInterface::MAX_DEPTH => 0,
         ]);
+        $dto->currency        = $entity->getCurrency();
         
         return $dto;
     }

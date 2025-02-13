@@ -62,7 +62,7 @@ class OrderItemApiToEntityMapper implements MapperInterface
         $entity->setQuantity($dto->quantity);
         $entity->setUnitPrice($dto->unitPrice);
         $entity->setTotalPrice($dto->totalPrice);
-        $entity->setDiscountAmount($dto->discountAmount);
+        $entity->setUnitPriceAfterDiscount($dto->unitPriceAfterDiscount);
 
         return $entity;
     }

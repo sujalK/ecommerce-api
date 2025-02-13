@@ -54,7 +54,8 @@ class ShippingAddressEntityToApiMapper implements MapperInterface
         $dto->createdAt    = $entity->getCreatedAt();
         $dto->updatedAt    = $entity->getUpdatedAt();
 
-        $dto->orders       = array_map(static fn (Order $order) => $this->microMapper->map($order, OrderApi::class, [ MicroMapperInterface::MAX_DEPTH => 0, ]), $entity->getOrders()->getValues());
+        $microMapper = $this->microMapper;
+        $dto->orders = array_map(static fn (Order $order) => $microMapper->map($order, OrderApi::class, [ MicroMapperInterface::MAX_DEPTH => 0, ]), $entity->getOrders()->getValues());
 
         return $dto;
     }

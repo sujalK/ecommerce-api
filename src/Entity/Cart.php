@@ -46,6 +46,9 @@ class Cart
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
     private ?string $totalPriceAfterDiscount = null;
 
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $currency = 'usd';
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
@@ -167,6 +170,18 @@ class Cart
     public function setTotalPriceAfterDiscount(?string $totalPriceAfterDiscount): static
     {
         $this->totalPriceAfterDiscount = $totalPriceAfterDiscount;
+
+        return $this;
+    }
+
+    public function getCurrency(): ?string
+    {
+        return $this->currency;
+    }
+
+    public function setCurrency(?string $currency): static
+    {
+        $this->currency = $currency;
 
         return $this;
     }

@@ -12,7 +12,7 @@ interface HttpResponseInterface
     public function unauthorizedResponse(string $textStatus): JsonResponse;
     public function successResponse(string $textStatus): JsonResponse;
     public function validationErrorResponse(array $errors, string $textStatus): JsonResponse;
-    public function notFoundException(?string $description = null, string $textStatus): JsonResponse;
+    public function notFoundException(string $textStatus, ?string $description = null): JsonResponse;
     public function invalidArgumentException(string $textStatus): JsonResponse;
 
     public function fileNotFoundException(string $textStatus, ?string $description = null): JsonResponse;

@@ -10,7 +10,9 @@ use App\ApiResource\CartItem\CartItemApi;
 use App\Contracts\Cart\CartManagerInterface;
 use App\Contracts\ErrorHandlerInterface;
 use App\Entity\User;
+use App\Service\ErrorHandler;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class CartItemStateProcessor implements ProcessorInterface
 {
@@ -18,7 +20,7 @@ class CartItemStateProcessor implements ProcessorInterface
     public function __construct (
         private readonly Security $security,
         private readonly CartManagerInterface $cartManager,
-        private readonly ErrorHandlerInterface $errorHandler,
+        #[Autowire(service: ErrorHandler::class)] private readonly ErrorHandlerInterface $errorHandler,
     )
     {
     }
@@ -33,7 +35,7 @@ class CartItemStateProcessor implements ProcessorInterface
         try {
             $this->cartManager->processCartOperation($user, $data);
         } catch (\Exception $e) {
-            return $this->errorHandler->handleCartError($e);
+            return $this->errorHandler->handleError($e);
         }
 
         return $data;

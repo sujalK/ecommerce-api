@@ -84,6 +84,23 @@ class PaymentController extends AbstractController
 
             $this->paymentService->processPaymentInfo($session_id, $order, $payment);
 
+            /**
+             * 1. Deduct the coupon usage count
+             * - Deduct
+             */
+            // Deduct the coupon usage count
+
+
+            /**
+             * 2. Update the total_price_after_discount in order table for keeping track of total amount after discount
+             */
+            // Update the total_price_after_discount
+            $paymentInfo = $this->paymentService->getPaymentInfoFromStripe($session_id);
+            $order->setTotalPriceAfterDiscount((string) $paymentInfo->amount);
+            
+            // Persist
+            $this->entityManager->persist($order);
+
             $this->entityManager->flush();
             $this->entityManager->commit();
         } catch (InvalidPaymentException) {

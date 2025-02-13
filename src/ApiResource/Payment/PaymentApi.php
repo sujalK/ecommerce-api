@@ -22,21 +22,18 @@ use App\State\PaymentProcessor;
     description: 'Payment resource',
     operations: [
         new Get(),
-        new GetCollection(security: 'is_granted("GET_COLLECTION", object)'),
-        new Post (
-            security: 'is_granted("ROLE_USER")'
-        ),
-        new Patch(security: 'is_granted("EDIT", object)'),
-        new Delete(security: 'is_granted("ROLE_ADMIN")'),
+        new GetCollection(),
+        new Post(),
     ],
-    // need to create another custom state Processor that performs payment
+    paginationItemsPerPage: 10,
+    security: 'is_granted("ROLE_USER")', // Makes sure user is logged-in to perform HTTP operation
     provider: EntityToDtoStateProvider::class,
     processor: PaymentProcessor::class,
-    stateOptions: new Options(entityClass: Payment::class)
+    stateOptions: new Options(entityClass: Payment::class),
 )]
 class PaymentApi
 {
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
+    #[ApiProperty(readable: true, writable: false, identifier: true)]
     public ?int $id                         = null;
 
     #[ApiProperty(writable: false)]

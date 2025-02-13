@@ -35,11 +35,11 @@ final class OrderFactory extends PersistentProxyObjectFactory
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
             'currency' => self::faker()->text(10),
             'ownedBy' => UserFactory::new(),
-            'paymentStatus' => self::faker()->text(20),
+            'paymentStatus' => 'pending',
             'shippingAddress' => ShippingAddressFactory::new(),
             'shippingMethod' => ShippingMethodFactory::new(),
-            'status' => self::faker()->text(20),
-            'totalPrice' => self::faker()->randomFloat(),
+            'status' => 'pending',
+            'totalPrice' => '100.00',
         ];
     }
 

@@ -24,24 +24,24 @@ class Order
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $totalPrice = null;
 
-    #[ORM\Column(length: 20)]
+    #[ORM\Column(length: 20, nullable: true)]
     private ?string $status = null;
 
     #[ORM\ManyToOne(inversedBy: 'orders')]
     #[ORM\JoinColumn(nullable: false)]
     private ?ShippingAddress $shippingAddress = null;
 
-    #[ORM\Column(length: 20)]
+    #[ORM\Column(length: 20, nullable: true)]
     private ?string $paymentStatus = null;
 
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $couponCode = null;
 
-    #[ORM\Column(length: 10)]
+    #[ORM\Column(length: 10, nullable: true)]
     private ?string $currency = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?\DateTimeImmutable $createdAt;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
@@ -116,7 +116,7 @@ class Order
         return $this->paymentStatus;
     }
 
-    public function setPaymentStatus(string $paymentStatus): static
+    public function setPaymentStatus(?string $paymentStatus): static
     {
         $this->paymentStatus = $paymentStatus;
 

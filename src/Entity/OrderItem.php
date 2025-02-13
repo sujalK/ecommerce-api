@@ -31,8 +31,8 @@ class OrderItem
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $totalPrice = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    private ?string $discountAmount = null;
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
+    private ?string $unitPriceAfterDiscount = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -42,7 +42,7 @@ class OrderItem
 
     public function __construct()
     {
-        $this->createdAt = (new \DateTime('now'))->format('Y-m-d\TH:i:sP');
+        $this->createdAt = (new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
     }
 
     public function getId(): ?int
@@ -79,7 +79,7 @@ class OrderItem
         return $this->quantity;
     }
 
-    public function setQuantity(int $quantity): static
+    public function setQuantity(?int $quantity): static
     {
         $this->quantity = $quantity;
 
@@ -91,7 +91,7 @@ class OrderItem
         return $this->unitPrice;
     }
 
-    public function setUnitPrice(string $unitPrice): static
+    public function setUnitPrice(?string $unitPrice): static
     {
         $this->unitPrice = $unitPrice;
 
@@ -103,21 +103,21 @@ class OrderItem
         return $this->totalPrice;
     }
 
-    public function setTotalPrice(string $totalPrice): static
+    public function setTotalPrice(?string $totalPrice): static
     {
         $this->totalPrice = $totalPrice;
 
         return $this;
     }
 
-    public function getDiscountAmount(): ?string
+    public function getUnitPriceAfterDiscount(): ?string
     {
-        return $this->discountAmount;
+        return $this->unitPriceAfterDiscount;
     }
 
-    public function setDiscountAmount(string $discountAmount): static
+    public function setUnitPriceAfterDiscount(?string $unitPriceAfterDiscount): static
     {
-        $this->discountAmount = $discountAmount;
+        $this->unitPriceAfterDiscount = $unitPriceAfterDiscount;
 
         return $this;
     }

@@ -48,7 +48,7 @@ class OrderItemEntityToApiMapper implements MapperInterface
         ]);
         $dto->quantity       = $entity->getQuantity();
         $dto->totalPrice     = $entity->getTotalPrice();
-        $dto->discountAmount = $entity->getDiscountAmount();
+        $dto->unitPriceAfterDiscount = $entity->getUnitPriceAfterDiscount();
 
         return $dto;
     }

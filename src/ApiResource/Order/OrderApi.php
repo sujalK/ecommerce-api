@@ -18,7 +18,8 @@ use App\ApiResource\User\UserApi;
 use App\Entity\Order;
 use App\State\DtoToEntityStateProcessor;
 use App\State\EntityToDtoStateProvider;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use App\State\PlaceOrderStateProcessor;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource (
     shortName: 'Order',
@@ -26,12 +27,15 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     operations: [
         new Get(),
         new GetCollection(),
-        new Post(),
-        new Patch(
-            validationContext: ['groups' => 'Default', 'patchValidation']
+        new Post (
+            processor: PlaceOrderStateProcessor::class,
         ),
-        new Delete(),
+//        new Patch(
+//            validationContext: ['groups' => 'Default', 'patchValidation']
+//        ),
+//        new Delete(),
     ],
+    paginationItemsPerPage: 10,
     security: 'is_granted("ROLE_USER")',
     provider: EntityToDtoStateProvider::class,
     processor: DtoToEntityStateProcessor::class,
@@ -40,25 +44,35 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class OrderApi
 {
 
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
+    #[ApiProperty(readable: true, writable: false, identifier: true)]
     public ?int $id = null;
 
+    #[ApiProperty(writable: false)]
     public ?UserApi $ownedBy = null;
 
-    public ?string $status = null;
+    #[ApiProperty(writable: false)]
+    public string $status = 'pending';
 
+    #[ApiProperty(writable: false)]
     public ?string $totalPrice = null;
 
+    #[ApiProperty(writable: false)]
     public ?string $couponCode = null;
 
+    #[Assert\NotNull]
+    #[ApiProperty(writable: true)]
     public ?ShippingAddressApi $shippingAddress = null;
 
-    public ?string $paymentStatus = null;
+    #[ApiProperty(writable: false)]
+    public ?string $paymentStatus = 'pending';
 
+    public ?string $currency = null;
+
+    #[Assert\NotNull]
+    #[ApiProperty(writable: true)]
     public ?ShippingMethodApi $shippingMethod = null;
 
     public ?\DateTimeImmutable $createdAt = null;
 
-    #[NotBlank(groups: ['patchValidation'])]
     public ?\DateTimeImmutable $updatedAt = null;
 }

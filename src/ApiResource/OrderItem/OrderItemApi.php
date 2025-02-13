@@ -36,7 +36,7 @@ class OrderItemApi
 
     public ?string $totalPrice              = null;
 
-    public ?string $discountAmount          = null;
+    public ?string $unitPriceAfterDiscount  = null;
 
     public ?string $totalPriceAfterDiscount = null;
 

@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 class ErrorHandler implements ErrorHandlerInterface
 {
 
-    public function handleCartError(Exception $e): Response
+    public function handleError(Exception $e): Response
     {
         if ($e instanceof ProductNotFoundException) {
             return new JsonResponse(['status' => 'error', 'message' => $e->getMessage()], Response::HTTP_BAD_REQUEST);

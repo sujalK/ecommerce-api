@@ -41,7 +41,7 @@ class GenericHttpResponse implements HttpResponseInterface
         return $this->jsonResponder->createResponse(HttpStatus::UNPROCESSABLE_ENTITY, $textStatus, $errors);
     }
 
-    public function notFoundException(?string $description = null, string $textStatus = self::ERROR): JsonResponse
+    public function notFoundException(string $textStatus = self::ERROR, ?string $description = null,): JsonResponse
     {
         return $this->jsonResponder->createResponse(status: HttpStatus::NOT_FOUND, textStatus: $textStatus, description: $description);
     }

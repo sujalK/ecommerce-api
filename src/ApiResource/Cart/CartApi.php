@@ -58,7 +58,7 @@ class CartApi
      * Another endpoint sets up the coupon code for Cart
      */
     #[Assert\Regex(
-        pattern: '/^[a-zA-Z]+$/',
+        pattern: '/^[a-zA-Z0-9]+$/',
         message: 'The value must contain only letters.'
     )]
     public ?string $couponCode              = null;

@@ -47,6 +47,16 @@ class CartItemRepository extends ServiceEntityRepository
                             ->getSingleScalarResult(); // Get a single value (count)
     }
 
+    public function deleteByCart(Cart $cart): void
+    {
+        $this->createQueryBuilder('ci')
+            ->delete()
+            ->where('ci.cart = :cart')
+            ->setParameter('cart', $cart)
+            ->getQuery()
+            ->execute();
+    }
+
     //    /**
     //     * @return CartItem[] Returns an array of CartItem objects
     //     */
