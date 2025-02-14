@@ -168,7 +168,7 @@ class CartManagerService implements CartManagerInterface
         // Persist the changes
         $this->syncWithDB($cart);
 
-        $this->inventoryService->deductQuantityFromInventory($data->product->id, $data->quantity);
+        // $this->inventoryService->deductQuantityFromInventory($data->product->id, $data->quantity);
 
         return [$cart, $cartItem];
     }

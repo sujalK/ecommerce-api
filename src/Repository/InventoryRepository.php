@@ -25,6 +25,26 @@ class InventoryRepository extends ServiceEntityRepository
                     ->getOneOrNullResult();
     }
 
+    public function deductInventory(int $productId, int $quantity): void
+    {
+        $entityManager = $this->getEntityManager();
+        $inventory = $this->findOneBy(['product' => $productId]);
+
+        if (!$inventory) {
+            throw new \RuntimeException("Inventory record not found for product ID: $productId");
+        }
+
+        if ($inventory->getQuantityInStock() < $quantity) {
+            throw new \RuntimeException("Not enough stock for product ID: $productId");
+        }
+
+        $inventory->setQuantityInStock($inventory->getQuantityInStock() - $quantity);
+        $inventory->setQuantitySold($inventory->getQuantitySold() + $quantity);
+
+        $entityManager->persist($inventory);
+        $entityManager->flush();
+    }
+
     //    /**
     //     * @return Inventory[] Returns an array of Inventory objects
     //     */

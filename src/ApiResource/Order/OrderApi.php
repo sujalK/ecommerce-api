@@ -28,6 +28,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get(),
         new GetCollection(),
         new Post (
+            security: 'is_granted("POST", object)',
             processor: PlaceOrderStateProcessor::class,
         ),
 //        new Patch(

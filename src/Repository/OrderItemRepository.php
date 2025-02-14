@@ -34,6 +34,18 @@ class OrderItemRepository extends ServiceEntityRepository
             ;
     }
 
+    /**
+     * Get all order items for a given order ID.
+     */
+    public function findByOrderId(int $orderId): array
+    {
+        return $this->createQueryBuilder('oi')
+                    ->where('oi.order = :orderId')
+                    ->setParameter('orderId', $orderId)
+                    ->getQuery()
+                    ->getResult();
+    }
+
     //    /**
     //     * @return OrderItem[] Returns an array of OrderItem objects
     //     */

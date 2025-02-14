@@ -9,6 +9,9 @@ use App\DataObjects\StripePaymentData;
 use App\Entity\Order;
 use App\Entity\Payment;
 use App\Exception\InvalidPaymentException;
+use App\Repository\InventoryRepository;
+use App\Repository\OrderItemRepository;
+use App\Repository\OrderRepository;
 use App\Service\Stripe\StripeClientService;
 use Stripe\Charge;
 use Stripe\Exception\ApiErrorException;
@@ -18,6 +21,8 @@ class SuccessfulPaymentService
     public function __construct (
         private readonly StripeClientService $stripeClient,
         private readonly DateAndTimeInterface $dateAndTime,
+        private readonly InventoryRepository $inventoryRepository,
+        private readonly OrderItemRepository $orderItemRepository,
     )
     {
     }
@@ -33,6 +38,7 @@ class SuccessfulPaymentService
 
         $this->updateOrderInfo($order, $paymentInfo);
         $this->updatePaymentInfo($payment, $order, $paymentInfo);
+        $this->deductProductQuantityFromInventory($order);
     }
 
     /**
@@ -97,5 +103,19 @@ class SuccessfulPaymentService
         if ($charge->status !== 'succeeded') {
             throw new InvalidPaymentException('Payment was not successful.');
         }
+    }
+
+    private function deductProductQuantityFromInventory(Order $order)
+    {
+
+        $orderItems = $this->orderItemRepository->findByOrderId($order->getId());
+
+        foreach ($orderItems as $orderItem) {
+            $this->inventoryRepository->deductInventory(
+                $orderItem->getProduct()->getId(),
+                $orderItem->getQuantity()
+            );
+        }
+
     }
 }

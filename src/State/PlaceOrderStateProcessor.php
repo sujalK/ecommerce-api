@@ -98,7 +98,7 @@ class PlaceOrderStateProcessor implements ProcessorInterface
         $this->entityManager->flush();
 
         return [
-            'status' => 'Order Placed successful, please make payment to confirm your order.',
+            'status' => 'Order Placed successfully. Please make payment to confirm your order.',
         ];
 
     }
