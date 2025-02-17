@@ -6,8 +6,8 @@ namespace App\Service;
 
 use App\Contracts\CloudServiceProviderInterface;
 use App\Contracts\EnvironmentVariablesServiceInterface;
-use App\DataObjects\PreSignedUrlExpiryTimeData;
 use App\Enum\EnvVars;
+use App\Enum\PreSignedUrlExpiryTimeData;
 use App\Exception\ErrorDeletingFileFromCloudStorageException;
 use App\Exception\MissingObjectKeyException;
 use Aws\Exception\AwsException;
