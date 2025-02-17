@@ -16,6 +16,7 @@ use App\State\EntityToDtoStateProvider;
 #[ApiResource (
     shortName: 'OrderItem',
     description: 'Item that belongs to an Order',
+    operations: [],
     provider: EntityToDtoStateProvider::class,
     processor: DtoToEntityStateProcessor::class,
     stateOptions: new Options(entityClass: OrderItem::class)

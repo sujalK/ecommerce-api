@@ -1,18 +1,19 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Security\Voter;
 
-use App\ApiResource\Order\OrderApi;
-use App\Entity\Order;
+use App\ApiResource\Wishlist\WishlistApi;
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-final class OrderVoter extends Voter
+final class WishlistVoter extends Voter
 {
-    public const string POST = 'POST';
+    public const string DELETE = 'DELETE';
 
     public function __construct (
         private readonly Security $security,
@@ -22,8 +23,8 @@ final class OrderVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return in_array($attribute, [self::POST])
-            && $subject instanceof OrderApi;
+        return in_array($attribute, [self::DELETE])
+            && $subject instanceof WishlistApi;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
@@ -34,20 +35,19 @@ final class OrderVoter extends Voter
         if (!$user instanceof UserInterface) {
             return false;
         }
-
         assert($user instanceof User);
-        assert($subject instanceof OrderApi);
+        assert($subject instanceof WishlistApi);
 
-        // Allow admin user to make order
-        if ( $this->security->isGranted('ROLE_ADMIN') ) {
+        // allow admin to delete anyone's wishlist
+        if ($this->security->isGranted('ROLE_ADMIN')) {
             return true;
         }
 
         // ... (check conditions and return true to grant permission) ...
         switch ($attribute) {
-            case self::POST:
+            case self::DELETE:
 
-                if ($subject->ownedBy->id === $user->getId()) {
+                if ( $subject->ownedBy->id === $user->getId() ) {
                     return true;
                 }
 

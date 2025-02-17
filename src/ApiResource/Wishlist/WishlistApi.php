@@ -25,10 +25,12 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get(),
         new GetCollection(),
         new Post(),
-        new Delete(),
+        new Delete(
+            security: 'is_granted("DELETE", object)',
+        ),
     ],
     paginationItemsPerPage: 10,
-    security: 'is_granted("WISHLIST_ACCESS", object)',
+    security: 'is_granted("ROLE_USER")',
     provider: EntityToDtoStateProvider::class,
     processor: DtoToEntityStateProcessor::class,
     stateOptions: new Options(entityClass: Wishlist::class)
@@ -36,7 +38,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class WishlistApi
 {
 
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
+    #[ApiProperty(readable: true, writable: false, identifier: true)]
     public ?int $id                       = null;
 
     #[Assert\NotBlank]
