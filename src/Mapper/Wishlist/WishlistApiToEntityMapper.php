@@ -45,11 +45,14 @@ class WishlistApiToEntityMapper implements MapperInterface
         assert($dto instanceof WishlistApi);
         assert($entity instanceof Wishlist);
 
-        $entity->setOwnedBy (
-            $this->microMapper->map($dto->ownedBy, User::class, [
-                MicroMapperInterface::MAX_DEPTH => 0,
-            ])
-        );
+        if ($dto->ownedBy) {
+            $entity->setOwnedBy (
+                $this->microMapper->map($dto->ownedBy, User::class, [
+                    MicroMapperInterface::MAX_DEPTH => 0,
+                ])
+            );
+        }
+
         $entity->setProduct (
             $this->microMapper->map($dto->product, Product::class, [
                 MicroMapperInterface::MAX_DEPTH => 0,

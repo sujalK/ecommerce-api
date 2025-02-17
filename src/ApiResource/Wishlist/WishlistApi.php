@@ -14,8 +14,12 @@ use ApiPlatform\Metadata\Post;
 use App\ApiResource\Product\ProductApi;
 use App\ApiResource\User\UserApi;
 use App\Entity\Wishlist;
+use App\State\CreateWishlistStateProcessor;
 use App\State\DtoToEntityStateProcessor;
 use App\State\EntityToDtoStateProvider;
+use App\Validator\IsUniqueProduct;
+use App\Validator\IsValidOwner;
+use App\Validator\IsValidProduct;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
@@ -24,7 +28,9 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(),
         new GetCollection(),
-        new Post(),
+        new Post(
+            processor: CreateWishlistStateProcessor::class,
+        ),
         new Delete(
             security: 'is_granted("DELETE", object)',
         ),
@@ -41,10 +47,14 @@ class WishlistApi
     #[ApiProperty(readable: true, writable: false, identifier: true)]
     public ?int $id                       = null;
 
-    #[Assert\NotBlank]
+//    #[Assert\NotBlank]
+//    #[IsValidOwner]
+    #[ApiProperty(readable: false, writable: false)]
     public ?UserApi $ownedBy              = null;
 
     #[Assert\NotBlank]
+    #[IsValidProduct]
+    #[IsUniqueProduct]
     public ?ProductApi $product           = null;
 
     public ?\DateTimeImmutable $createdAt = null;

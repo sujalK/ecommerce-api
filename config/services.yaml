@@ -37,6 +37,10 @@ services:
         tags:
             - { name: 'kernel.event_listener', event: 'kernel.exception', priority: 20000 }
 
+    # set up exception listener (for API)
+    App\EventListener\ApiExceptionListener:
+        tags:
+            - { name: 'kernel.event_subscriber' }
     # Custom controllers for Product
     App\Controller\CreateProductController:
         tags: [ 'controller.service_arguments' ]

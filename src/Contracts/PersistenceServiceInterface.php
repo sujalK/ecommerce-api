@@ -10,5 +10,5 @@ interface PersistenceServiceInterface
 
     public function flush(): void;
 
-    public function sync(object $entity = null): void;
+    public function sync(?object $entity = null): void;
 }

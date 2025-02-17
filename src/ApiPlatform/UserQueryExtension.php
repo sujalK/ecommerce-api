@@ -28,6 +28,14 @@ class UserQueryExtension implements QueryCollectionExtensionInterface, QueryItem
 
     public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, ?Operation $operation = null, array $context = []): void
     {
+        $requestUri   = $context['request_uri'];
+        $supportedUri = '/api/users';
+
+        // if api request is not from the /api/users, skip the filtering
+        if ( ! str_contains($requestUri, $supportedUri) ) {
+            return;
+        }
+
         $this->addUserIdEqualsToLoggedInUserId($queryBuilder, $resourceClass);
     }
 
