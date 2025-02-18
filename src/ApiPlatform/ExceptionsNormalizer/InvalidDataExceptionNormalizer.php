@@ -31,7 +31,7 @@ class InvalidDataExceptionNormalizer implements NormalizerInterface
     /**
      * Determines whether this normalizer can normalize the given data.
      */
-    public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         dump('Checking normalization support for:', $data);
         return $data instanceof InvalidDataException;

@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\EventListener;
 
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
+use App\Exception\MaxShippingAddressReachedException;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,6 +20,15 @@ class ApiExceptionListener implements EventSubscriberInterface
     {
         $exception = $event->getThrowable();
         $response  = null;
+
+        // For max shippingAddressException
+        if ($exception instanceof MaxShippingAddressReachedException) {
+            $response = new JsonResponse([
+                'success'     => false,
+                'message'     => 'Too many shippingAddresses',
+                'description' => 'Please make sure to edit the existing one. Max shipping address reached.',
+            ], 422);
+        }
 
         // Catch the serializer's unexpected value exception
         if ($exception instanceof UnexpectedValueException) {

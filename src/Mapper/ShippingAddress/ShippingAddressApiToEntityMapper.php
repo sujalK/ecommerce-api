@@ -62,15 +62,18 @@ class ShippingAddressApiToEntityMapper implements MapperInterface
         $entity->setPostalCode($dto->postalCode);
         $entity->setCountry($dto->country);
         $entity->setPhoneNumber($dto->phoneNumber);
-        $entity->setCreatedAt($dto->createdAt);
-        $entity->setUpdatedAt($dto->updatedAt);
+        // $entity->setCreatedAt($dto->createdAt);
+
+        if ($dto->updatedAt) {
+            $entity->setUpdatedAt($dto->updatedAt);
+        }
 
         // OrderApi[] -> Order[]
         $microMapper   = $this->microMapper;
-        $orderEntities = array_map (static fn(OrderApi $orderApi) => $microMapper->map ($orderApi, Order::class, [ MicroMapperInterface::MAX_DEPTH => 0, ]), $dto->orders);
-
-        // set values
-        $this->propertyAccessor->setValue($entity, 'orders', $orderEntities);
+//        $orderEntities = array_map (static fn(OrderApi $orderApi) => $microMapper->map ($orderApi, Order::class, [ MicroMapperInterface::MAX_DEPTH => 0, ]), $dto->orders);
+//
+//        // set values
+//        $this->propertyAccessor->setValue($entity, 'orders', $orderEntities);
 
         return $entity;
     }

@@ -16,7 +16,7 @@ class PersistenceService implements PersistenceServiceInterface
     {
     }
 
-    public function sync(object $entity = null): void
+    public function sync(?object $entity = null): void
     {
         if ( $entity ) {
             $this->entityManager->persist($entity);
