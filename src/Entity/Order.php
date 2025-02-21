@@ -52,6 +52,9 @@ class Order
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
     private ?string $totalPriceAfterDiscount = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $shippingStatus = null;
     
     public function __construct()
     {
@@ -191,6 +194,18 @@ class Order
     public function setTotalPriceAfterDiscount(?string $totalPriceAfterDiscount): static
     {
         $this->totalPriceAfterDiscount = $totalPriceAfterDiscount;
+
+        return $this;
+    }
+
+    public function getShippingStatus(): ?string
+    {
+        return $this->shippingStatus;
+    }
+
+    public function setShippingStatus(?string $shippingStatus): static
+    {
+        $this->shippingStatus = $shippingStatus;
 
         return $this;
     }

@@ -62,8 +62,10 @@ class ProductReviewApiToEntityMapper implements MapperInterface
 
         // if updatedAt is sent to us
         if ( $dto->updatedAt ) {
-            $entity->setCreatedAt($dto->updatedAt);
+            $entity->setUpdatedAt($dto->updatedAt);
         }
+
+        $entity->setIsActive($dto->isActive);
 
         return $entity;
     }

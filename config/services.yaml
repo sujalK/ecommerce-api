@@ -51,6 +51,10 @@ services:
     App\Service\Product\Patch\ProductImageUpdateService:
         tags: [ 'controller.service_arguments' ]
 
+#    App\Validator\CanPostReviewValidator:
+#        tags:
+#            - { name: validator.constraint_validator }
+
     Aws\S3\S3Client:
         arguments:
             -

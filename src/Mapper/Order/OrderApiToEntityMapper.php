@@ -74,6 +74,7 @@ class OrderApiToEntityMapper implements MapperInterface
             ])
         );
         $entity->setCurrency($dto->currency);
+        $entity->setShippingStatus($dto->shippingStatus);
 
         return $entity;
     }

@@ -4,7 +4,9 @@ namespace App\Repository;
 
 use App\Entity\Order;
 use App\Entity\OrderItem;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -44,6 +46,22 @@ class OrderItemRepository extends ServiceEntityRepository
                     ->setParameter('orderId', $orderId)
                     ->getQuery()
                     ->getResult();
+    }
+
+    public function findOneByProductAndUserWithShippedStatus(int $productId, User $user): ?OrderItem
+    {
+        return $this->createQueryBuilder('oi')
+                    ->innerJoin('oi.order', 'o')
+                    ->andWhere('oi.product = :product')
+                    ->andWhere('o.ownedBy = :user')
+                    ->andWhere('o.shippingStatus = :shippingStatus')
+                    ->setParameter('product', $productId)
+                    ->setParameter('user', $user)
+                    ->setParameter('shippingStatus', 'shipped')
+                    ->orderBy('oi.id', 'DESC')
+                    ->setMaxResults(1)
+                    ->getQuery()
+                    ->getOneOrNullResult();
     }
 
     //    /**

@@ -68,6 +68,8 @@ class OrderApi
 
     public ?string $currency = null;
 
+    public string $shippingStatus = 'not_initiated';
+
     #[Assert\NotNull]
     #[ApiProperty(writable: true)]
     public ?ShippingMethodApi $shippingMethod = null;

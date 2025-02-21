@@ -59,6 +59,7 @@ class ProductReviewEntityToApiMapper implements MapperInterface
         if ( $entity->getUpdatedAt() ) {
             $dto->dateUpdated = Carbon::parse($entity->getUpdatedAt())->diffForHumans();
         }
+        $dto->isActive = $entity->isActive();
 
         return $dto;
     }
