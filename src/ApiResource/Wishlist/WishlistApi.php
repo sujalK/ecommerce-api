@@ -29,6 +29,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get(),
         new GetCollection(),
         new Post(
+            validationContext: ['groups' => ['Default', 'postValidation']],
             processor: CreateWishlistStateProcessor::class,
         ),
         new Delete(
@@ -47,16 +48,16 @@ class WishlistApi
     #[ApiProperty(readable: true, writable: false, identifier: true)]
     public ?int $id                       = null;
 
-//    #[Assert\NotBlank]
-//    #[IsValidOwner]
     #[ApiProperty(readable: false, writable: false)]
+    #[IsValidOwner]
     public ?UserApi $ownedBy              = null;
 
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(groups: ['postValidation'])]
     #[IsValidProduct]
     #[IsUniqueProduct]
     public ?ProductApi $product           = null;
 
+    #[ApiProperty(readable: false, writable: false)]
     public ?\DateTimeImmutable $createdAt = null;
 
 }

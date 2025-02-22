@@ -5,7 +5,9 @@ declare(strict_types = 1);
 namespace App\Validator;
 
 use App\ApiResource\Product\ProductApi;
+use App\Entity\User;
 use App\Repository\WishlistRepository;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -14,6 +16,7 @@ class IsUniqueProductValidator extends ConstraintValidator
 
     public function __construct (
         private readonly WishlistRepository $wishlistRepository,
+        private readonly Security $security,
     )
     {
     }
@@ -28,7 +31,10 @@ class IsUniqueProductValidator extends ConstraintValidator
 
         assert($value instanceof ProductApi);
 
-        $product = $this->wishlistRepository->findOneBy(['product' => $value->id]);
+        $user = $this->security->getUser();
+        assert($user instanceof User);
+
+        $product = $this->wishlistRepository->findOneBy(['product' => $value->id, 'ownedBy' => $user]);
 
         // If the product is already in wishlist, create violation
         if ($product) {
