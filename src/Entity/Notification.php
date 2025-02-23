@@ -21,10 +21,15 @@ class Notification
     private ?string $message = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private \DateTimeImmutable $createdAt;
 
     #[ORM\Column]
-    private ?bool $isRead = null;
+    private bool $isRead = false;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+    }
 
     public function getId(): ?int
     {

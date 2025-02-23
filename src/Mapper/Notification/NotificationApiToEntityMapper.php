@@ -52,8 +52,13 @@ class NotificationApiToEntityMapper implements MapperInterface
             ])
         );
         $entity->setMessage($dto->message);
-        $entity->setCreatedAt($dto->createdAt);
-        $entity->setRead($dto->isRead);
+        if ($dto->createdAt) {
+            $entity->setCreatedAt($dto->createdAt);
+        }
+
+        if ($dto->isRead) {
+            $entity->setRead($dto->isRead);
+        }
 
         return $entity;
     }
