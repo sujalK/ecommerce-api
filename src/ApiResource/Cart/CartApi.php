@@ -31,9 +31,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 //        new Post (
 //            security: 'is_granted("ADD", object)',
 //        ),
-        new Patch (
-            security: 'is_granted("EDIT", object)'
-        ),
+
+//        new Patch (
+//            security: 'is_granted("EDIT", object)'
+//        ),
     ],
     paginationItemsPerPage: 10,
     provider: EntityToDtoStateProvider::class,
