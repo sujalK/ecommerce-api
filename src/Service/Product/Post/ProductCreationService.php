@@ -9,6 +9,7 @@ use App\Contracts\HttpResponseInterface;
 use App\DataObjects\FileUploadData;
 use App\Entity\Product;
 use App\Entity\ProductCategory;
+use App\Enum\ActivityLog;
 use App\Enum\EnvVars;
 use App\Exception\AuthenticationException;
 use App\Exception\FileNotFoundException;
@@ -17,6 +18,7 @@ use App\Exception\InvalidFileException;
 use App\Exception\InvalidProductInfoException;
 use App\Exception\UnauthorizedException;
 use App\Repository\ProductCategoryRepository;
+use App\Service\ActivityLogService;
 use App\Service\AuthService;
 use App\Service\FileUploaderService;
 use App\Service\PersistenceService;
@@ -36,6 +38,7 @@ class ProductCreationService
         private readonly ProductCategoryRepository            $categoryRepository,
         private readonly FileUploaderService                  $fileUploader,
         private readonly EnvironmentVariablesServiceInterface $environmentVariablesService,
+        private readonly ActivityLogService                   $activityLogService,
     )
     {
     }
@@ -152,6 +155,9 @@ class ProductCreationService
     {
         $fileUploadData = $this->fileUploader->initUpload($request);
         $product        = $this->createProduct($request, $category, $fileUploadData);
+
+        // log
+        $this->activityLogService->storeLog(ActivityLog::CREATE_PRODUCT, $product);
 
         return [$fileUploadData, $product];
     }

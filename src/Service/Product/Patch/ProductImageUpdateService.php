@@ -9,6 +9,7 @@ use App\Contracts\DateAndTimeInterface;
 use App\Contracts\File\S3\FileUploaderInterface;
 use App\Contracts\PersistenceServiceInterface;
 use App\Entity\Product;
+use App\Enum\ActivityLog;
 use App\Enum\DateTime;
 use App\Exception\FileNotFoundException;
 use App\Exception\FileTooLargeException;
@@ -17,6 +18,7 @@ use App\Exception\InventoryException\ProductNotFoundException;
 use App\Factories\ProductResponseFactory;
 use App\Http\ProductImageUpdateExceptionHandler;
 use App\Repository\ProductRepository;
+use App\Service\ActivityLogService;
 use App\Service\Product\Patch\RequestMapper\ProductImageUpdateRequestMapper;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -51,6 +53,7 @@ class ProductImageUpdateService
         private readonly ProductResponseFactory $productResponseFactory,
         private readonly ProductImageUpdateExceptionHandler $exceptionHandler,
         private readonly ProductImageUpdateRequestMapper $requestMapper,
+        private readonly ActivityLogService $activityLogService,
     )
     {
     }
@@ -84,6 +87,10 @@ class ProductImageUpdateService
 
         // update file
         $this->update($s3FileName, $productRequestData->uploadedFile, $product);
+
+        // log
+        $this->activityLogService->storeLog(ActivityLog::UPDATE_PRODUCT_IMAGE);
+
 
         // create product response
         return $this->productResponseFactory->create($product, $productRequestData->productId, $s3FileName);

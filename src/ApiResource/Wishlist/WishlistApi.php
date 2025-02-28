@@ -17,6 +17,7 @@ use App\Entity\Wishlist;
 use App\State\CreateWishlistStateProcessor;
 use App\State\DtoToEntityStateProcessor;
 use App\State\EntityToDtoStateProvider;
+use App\State\WishlistStateProcessor;
 use App\Validator\IsUniqueProduct;
 use App\Validator\IsValidOwner;
 use App\Validator\IsValidProduct;
@@ -39,7 +40,8 @@ use Symfony\Component\Validator\Constraints as Assert;
     paginationItemsPerPage: 10,
     security: 'is_granted("ROLE_USER")',
     provider: EntityToDtoStateProvider::class,
-    processor: DtoToEntityStateProcessor::class,
+    // processor: DtoToEntityStateProcessor::class,
+    processor: WishlistStateProcessor::class,
     stateOptions: new Options(entityClass: Wishlist::class)
 )]
 class WishlistApi

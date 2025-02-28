@@ -25,7 +25,8 @@ use Symfony\Component\Validator\Constraints as Assert;
             input: false, // Disables the deserialization for the remove-coupon operation
             processor: RemoveCouponStateProcessor::class,
         ),
-    ]
+    ],
+    security: 'is_granted("ROLE_USER")',
 )]
 class DiscountApi
 {

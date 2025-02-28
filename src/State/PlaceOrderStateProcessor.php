@@ -12,10 +12,12 @@ use App\Contracts\HttpResponseInterface;
 use App\Entity\Cart;
 use App\Entity\Order;
 use App\Entity\OrderItem;
+use App\Enum\ActivityLog;
 use App\Exception\CartNotFoundException;
 use App\Repository\CartItemRepository;
 use App\Repository\CartRepository;
 use App\Repository\OrderRepository;
+use App\Service\ActivityLogService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -33,6 +35,7 @@ class PlaceOrderStateProcessor implements ProcessorInterface
         private readonly MicroMapperInterface $microMapper,
         private readonly HttpResponseInterface $httpResponse,
         private readonly DtoToEntityStateProcessor $innerProcessor,
+        private readonly ActivityLogService $activityLogService,
     )
     {
     }
@@ -96,6 +99,9 @@ class PlaceOrderStateProcessor implements ProcessorInterface
         // remove the cart from the database
         $this->entityManager->remove($cart);
         $this->entityManager->flush();
+
+        // log
+        $this->activityLogService->storeLog(ActivityLog::PLACE_ORDER, $cart);
 
         return [
             'status' => 'Order Placed successfully. Please make payment to confirm your order.',

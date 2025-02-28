@@ -12,10 +12,12 @@ use App\DataObjects\DiscountData;
 use App\Entity\Cart;
 use App\Entity\Coupon;
 use App\Entity\User;
+use App\Enum\ActivityLog;
 use App\Exception\CouponGlobalUsageLimitExceededException;
 use App\Exception\CouponSingleUserLimitExceededException;
 use App\Repository\CartRepository;
 use App\Repository\OrderRepository;
+use App\Service\ActivityLogService;
 use App\Service\CouponValidatorService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -31,6 +33,7 @@ class ApplyCouponStateProcessor implements ProcessorInterface
         private readonly CartRepository $cartRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly OrderRepository $orderRepository,
+        private readonly ActivityLogService $activityLogService,
     )
     {
     }
@@ -58,6 +61,11 @@ class ApplyCouponStateProcessor implements ProcessorInterface
             return $this->httpResponse->invalidDataResponse(errors: ['No cart found to apply the coupon.']);
         }
 
+        // check if active cart belongs to the logged-in user
+        if ($activeCart->getOwner() !== $user) {
+            return $this->httpResponse->forbiddenResponse();
+        }
+
         // if $response is not Coupon, then return $response
         if (! $response instanceof Coupon) {
             $this->removeCoupon($activeCart);
@@ -80,6 +88,9 @@ class ApplyCouponStateProcessor implements ProcessorInterface
 
         // add coupon to cart
         $this->applyCouponToCart($activeCart, $couponCode);
+
+        // log the activity
+        $this->log($couponCode);
 
         return $this->getDiscountData($coupon);
     }
@@ -136,5 +147,14 @@ class ApplyCouponStateProcessor implements ProcessorInterface
         if ($couponUsageCount >= $coupon->getSingleUserLimit()) {
             throw new CouponSingleUserLimitExceededException();
         }
+    }
+
+    public function log(string $couponCode): void
+    {
+        // store the coupon code in object
+        $couponData = new \stdClass();
+        $couponData->couponCode = $couponCode;
+
+        $this->activityLogService->storeLog(ActivityLog::APPLY_COUPON, $couponData);
     }
 }

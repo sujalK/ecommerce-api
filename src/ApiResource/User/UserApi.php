@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\Post;
 use App\Entity\User;
 use App\State\DtoToEntityStateProcessor;
 use App\State\EntityToDtoStateProvider;
+use App\State\UserStateProcessor;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -33,16 +34,17 @@ use Symfony\Component\Validator\Constraints as Assert;
             validationContext: ['groups' => ['Default', 'postValidation']]
         ),
         new Patch(
-            // security: 'is_granted("ROLE_USER_EDIT")'
+            security: 'is_granted("EDIT", object)'
         ),
         new Delete(
-            security: 'is_granted("ROLE_USER_DELETE")'
+            security: 'is_granted("DELETE", object)'
         ),
     ],
     paginationItemsPerPage: 5,
     // security: 'is_granted("ROLE_USER")',
     provider: EntityToDtoStateProvider::class,
-    processor: DtoToEntityStateProcessor::class,
+    // processor: DtoToEntityStateProcessor::class,
+    processor: UserStateProcessor::class,
     stateOptions: new Options(entityClass: User::class),
 )]
 class UserApi

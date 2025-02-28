@@ -11,12 +11,14 @@ use App\Entity\Coupon;
 use App\Entity\Order;
 use App\Entity\OrderItem;
 use App\Entity\User;
+use App\Enum\ActivityLog;
 use App\Exception\CouponExpiredException;
 use App\Exception\CouponNotFoundException;
 use App\Repository\CouponRepository;
 use App\Repository\OrderItemRepository;
 use App\Repository\OrderRepository;
 use App\Repository\PaymentRepository;
+use App\Service\ActivityLogService;
 use Doctrine\ORM\EntityManagerInterface;
 use Stripe\Checkout\Session;
 use Stripe\Exception\ApiErrorException;
@@ -35,6 +37,7 @@ class PaymentProcessor implements ProcessorInterface
         private readonly MicroMapperInterface $microMapper,
         private readonly OrderRepository $orderRepository,
         private readonly CouponRepository $couponRepository,
+        private readonly ActivityLogService $activityLogService,
         private readonly Security $security,
         public string $stripeSecretKey,
     )
@@ -62,8 +65,20 @@ class PaymentProcessor implements ProcessorInterface
             throw new \Exception('No order items found for this order.');
         }
 
-        // Validate coupon and get coupon object (if any). If not valid, no discount is applied.
-        $coupon = $this->validateAndGetCoupon($order);
+        try {
+            // Validate coupon and get coupon object (if any). If not valid, no discount is applied.
+            $coupon = $this->validateAndGetCoupon($order);
+        } catch (CouponExpiredException) {
+            // log
+            $this->log(ActivityLog::COUPON_EXPIRED, 'Coupon Expired');
+
+            return ['error' => 'Coupon expired'];
+        } catch (CouponNotFoundException) {
+            // log
+            $this->log(ActivityLog::COUPON_NOT_FOUND, 'Coupon not found');
+
+            return ['error' => 'Coupon not found'];
+        }
 
         // Build line items for Stripe Checkout. Discount is applied per order item.
         $lineItems = $this->getLineItems($order, $orderItems, $coupon);
@@ -90,6 +105,9 @@ class PaymentProcessor implements ProcessorInterface
                 $payment->setStripeSessionId($sessionId);
                 $this->entityManager->flush();
 
+                // log
+                $this->log(ActivityLog::INIT_COUPON_CODE_BASED_PAYMENT, $sessionId);
+
                 return ['stripeSessionId' => $sessionId];
             }
 
@@ -100,6 +118,9 @@ class PaymentProcessor implements ProcessorInterface
                 $session = Session::retrieve($existingSessionId);
 
                 if ($session->status !== 'expired' && $session->status !== 'canceled') {
+                    // log
+                    $this->log(ActivityLog::INITIALIZE_TO_PROCESS_PAYMENT, $existingSessionId);
+
                     // Reuse the existing session
                     return ['stripeSessionId' => $existingSessionId];
                 } else {
@@ -107,11 +128,16 @@ class PaymentProcessor implements ProcessorInterface
                     $payment->setStripeSessionId($sessionId);
                     $this->entityManager->flush();
 
+                    // log
+                    $this->log(ActivityLog::RESUME_NON_COUPON_BASED_EXISTING_PAYMENT, $sessionId);
+
                     return ['stripeSessionId' => $sessionId];
                 }
             }
 
         } catch (ApiErrorException $e) {
+            $this->log(ActivityLog::PAYMENT_API_ERROR_EXCEPTION, $e->getMessage());
+
             return ['error' => $e->getMessage()];
         }
 
@@ -273,6 +299,15 @@ class PaymentProcessor implements ProcessorInterface
         }
 
         return false;
+    }
+
+    public function log(ActivityLog $log, string $description, string $sessionId = ''): void
+    {
+        $object = new \stdClass();
+        $object->stripeSessionId = $sessionId   ?: null;
+        $object->description     = $description ?: null;
+
+        $this->activityLogService->storeLog($log, $object);
     }
 
 }

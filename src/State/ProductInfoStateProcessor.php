@@ -9,7 +9,9 @@ use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Product\ProductApi;
 use App\Contracts\EnvironmentVariablesServiceInterface;
 use App\Contracts\RequestDataUtilsInterface;
+use App\Enum\ActivityLog;
 use App\Enum\EnvVars;
+use App\Service\ActivityLogService;
 
 class ProductInfoStateProcessor implements ProcessorInterface
 {
@@ -18,6 +20,7 @@ class ProductInfoStateProcessor implements ProcessorInterface
         private readonly DtoToEntityStateProcessor $processor,
         private readonly RequestDataUtilsInterface $requestDataUtils,
         private readonly EnvironmentVariablesServiceInterface $envVarsService,
+        private readonly ActivityLogService $activityLogService,
     )
     {
     }
@@ -33,6 +36,9 @@ class ProductInfoStateProcessor implements ProcessorInterface
 
         // set the productImage, in response of update
         $data->productImage = $this->getProductImage($data);
+
+        // log
+        $this->activityLogService->storeLog(ActivityLog::UPDATE_PRODUCT_INFO);
 
         return $data;
     }

@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\Post;
 use App\Entity\ShippingMethod;
 use App\State\DtoToEntityStateProcessor;
 use App\State\EntityToDtoStateProvider;
+use App\State\ShippingMethodStateProcessor;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -35,7 +36,8 @@ use Symfony\Component\Validator\Constraints as Assert;
     paginationItemsPerPage: 10,
     security: 'is_granted("ROLE_ADMIN")',
     provider: EntityToDtoStateProvider::class,
-    processor: DtoToEntityStateProcessor::class,
+    // processor: DtoToEntityStateProcessor::class,
+    processor: ShippingMethodStateProcessor::class,
     stateOptions: new Options(entityClass: ShippingMethod::class),
 )]
 #[UniqueEntity(fields: ['name'], message: 'The shipping method "name" must be unique.', entityClass: ShippingMethod::class)]

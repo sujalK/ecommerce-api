@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\State;
 
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
@@ -11,6 +12,8 @@ use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\ProductReview\ProductReviewApi;
 use App\ApiResource\User\UserApi;
 use App\Entity\User;
+use App\Enum\ActivityLog;
+use App\Service\ActivityLogService;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 
@@ -18,6 +21,7 @@ class ProductReviewStateProcessor implements ProcessorInterface
 {
 
     public function __construct (
+        private readonly ActivityLogService $activityLogService,
         private readonly DtoToEntityStateProcessor $processor,
         private readonly MicroMapperInterface $microMapper,
         private readonly Security $security,
@@ -44,7 +48,22 @@ class ProductReviewStateProcessor implements ProcessorInterface
             ]);
         }
 
+        $entity = $this->processor->process($data, $operation, $uriVariables, $context);
 
-        return $this->processor->process($data, $operation, $uriVariables, $context);
+        // log
+        $this->log($operation, $entity);
+
+        return $entity;
+    }
+
+    public function log(Operation $operation, mixed $entity): void
+    {
+        if ($operation instanceof Post) {
+            $this->activityLogService->storeLog(ActivityLog::CREATE_PRODUCT_REVIEW, $entity);
+        } else if ($operation instanceof Patch) {
+            $this->activityLogService->storeLog(ActivityLog::UPDATE_PRODUCT_REVIEW, $entity);
+        } else if ($operation instanceof Delete) {
+            $this->activityLogService->storeLog(ActivityLog::DELETE_PRODUCT_REVIEW);
+        }
     }
 }

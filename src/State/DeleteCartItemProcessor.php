@@ -7,6 +7,7 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\CartItem\CartItemApi;
+use App\Contracts\ActivityLogFormatterInterface;
 use App\Entity\Cart;
 use App\Enum\ActivityLog;
 use App\Repository\CartItemRepository;
@@ -18,6 +19,7 @@ class DeleteCartItemProcessor implements ProcessorInterface
 {
 
     public function __construct(
+        private readonly ActivityLogFormatterInterface $activityLogFormatter,
         private readonly ActivityLogService $activityLogService,
         private readonly DtoToEntityStateProcessor $processor,
         private readonly Security $security,
@@ -31,14 +33,11 @@ class DeleteCartItemProcessor implements ProcessorInterface
     {
         assert($data instanceof CartItemApi);
 
-        // log the user activity
-        $this->activityLogService->logActivity (
-            log: ActivityLog::DELETE_CART_ITEM,
-            description: ActivityLog::DELETE_CART_ITEM->getDeleteCartItemDescription($data->product->id)
-        );
-
         // Perform cart item deletion
         $result = $this->processor->process($data, $operation, $uriVariables, $context);
+
+        // log the delete activity
+        $this->activityLogService->storeLog(ActivityLog::DELETE_CART_ITEM);
 
         $this->deleteCartIfNoCartItemIsLeft($data);
 
@@ -60,6 +59,9 @@ class DeleteCartItemProcessor implements ProcessorInterface
 
         // Check if there is no cart items left
         if ($remainingCartItems === 0) {
+            // log activity
+            $this->activityLogService->storeLog(ActivityLog::DELETE_CART, $cart);
+
             // If no items remain, delete the cart as well
             $this->entityManager->remove($cart);
             $this->entityManager->flush();

@@ -8,14 +8,13 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\State\ProcessorInterface;
-use App\ApiResource\Notification\NotificationApi;
 use App\Enum\ActivityLog;
 use App\Service\ActivityLogService;
 
-class NotificationStateProcessor implements ProcessorInterface
+class WishlistStateProcessor implements ProcessorInterface
 {
 
-    public function __construct(
+    public function __construct (
         private readonly DtoToEntityStateProcessor $processor,
         private readonly ActivityLogService $activityLogService,
     )
@@ -24,27 +23,23 @@ class NotificationStateProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        assert($data instanceof NotificationApi);
-
-        // For post request, set isRead to NULL even if it is sent during the request
-        if ($operation instanceof Post) {
-            $data->isRead = null;
-        }
 
         $entity = $this->processor->process($data, $operation, $uriVariables, $context);
 
-        // store the log
-        $this->log($operation, $entity);
+        $this->log($operation, $entity, $uriVariables['id'] ?? null);
 
         return $entity;
     }
 
-    public function log(Operation $operation, mixed $entity): void
+    public function log(Operation $operation, mixed $entity, ?int $id = null): void
     {
         if ($operation instanceof Post) {
-            $this->activityLogService->storeLog(ActivityLog::POST_NOTIFICATION, $entity);
+            $this->activityLogService->storeLog(ActivityLog::CREATE_WISHLIST, $entity);
         } else if ($operation instanceof Delete) {
-            $this->activityLogService->storeLog(ActivityLog::DELETE_NOTIFICATION);
+            $object       = new \stdClass();
+            $object->id ??= $id;
+
+            $this->activityLogService->storeLog(ActivityLog::DELETE_WISHLIST, $object);
         }
     }
 }
