@@ -93,15 +93,15 @@ class PlaceOrderStateProcessor implements ProcessorInterface
             }
         }
 
+        // log before deleting the cart
+        $this->activityLogService->storeLog(ActivityLog::PLACE_ORDER, $cart);
+
         // delete all associated cart item
         $this->cartItemRepository->deleteByCart($cart);
 
         // remove the cart from the database
         $this->entityManager->remove($cart);
         $this->entityManager->flush();
-
-        // log
-        $this->activityLogService->storeLog(ActivityLog::PLACE_ORDER, $cart);
 
         return [
             'status' => 'Order Placed successfully. Please make payment to confirm your order.',

@@ -54,10 +54,6 @@ enum ActivityLog: string
     case INITIALIZE_TO_PROCESS_PAYMENT            = 'INITIALIZE TO PROCESS PAYMENT';
     case PAYMENT_API_ERROR_EXCEPTION              = 'ApiError exception: Exception during payment processing to create stripe session id';
 
-
-    case COUPON_EXPIRED   = 'COUPON EXPIRED';
-    case COUPON_NOT_FOUND = 'COUPON NOT FOUND';
-
     /*
      * ProductApi
      */
@@ -106,6 +102,14 @@ enum ActivityLog: string
      */
     case CREATE_WISHLIST = 'CREATE WISHLIST';
     case DELETE_WISHLIST = 'DELETE WISHLIST';
+
+    /*
+     * Coupon / Payment
+     */
+    case COUPON_EXPIRED   = 'COUPON EXPIRED';
+    case COUPON_NOT_FOUND = 'COUPON NOT FOUND';
+
+    case STRIPE_API_ERROR = 'STRIPE API ERROR';
 
     public function getDescription(): string
     {

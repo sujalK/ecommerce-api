@@ -14,6 +14,7 @@ use App\Entity\User;
 use App\Enum\ActivityLog;
 use App\Exception\CouponExpiredException;
 use App\Exception\CouponNotFoundException;
+use App\Exception\PendingOrderNotFoundException;
 use App\Repository\CouponRepository;
 use App\Repository\OrderItemRepository;
 use App\Repository\OrderRepository;
@@ -54,11 +55,64 @@ class PaymentProcessor implements ProcessorInterface
 
         // Check if order is found and its status is "placed"
         if ($order === null || $order->getStatus() !== 'pending') {
-            throw new \Exception('Order not found or not placed.');
+            throw new PendingOrderNotFoundException('Order not found or not placed.');
         }
 
         // Fetch the associated order items (Make sure order items are linked to the order)
         $orderItems = $this->orderItemRepository->findBy(['order' => $order]);
+
+        // get payment for current order ( if it's available, like if POSTMAN client tried to process payment )
+        $payment = $this->paymentRepository->findOneBy(['order' => $order, 'paymentStatus'  => NULL]);
+
+        // If payment is already created, through API Client ( Ex: Postman ), then proceed from here
+        if ($payment !== null) {
+
+            // It's like we're giving option to re-add coupon for non-paid orders (pending orders), so we're re-calculating lineItems
+            // along with discounted value, coupon
+            if ($order->getCouponCode() !== null) {
+                // If there is coupon code presence, update the lineItems and
+                try {
+                    $coupon = $this->validateAndGetCoupon($order);
+                } catch (CouponNotFoundException $e) {
+                    $this->activityLogService->storeLog(ActivityLog::COUPON_NOT_FOUND);
+                    return ['error' => 'Coupon not found'];
+                } catch (CouponExpiredException $e) {
+                    $this->activityLogService->storeLog(ActivityLog::COUPON_EXPIRED);
+                    return ['error' => 'Coupon expired'];
+                }
+
+                $lineItems = $this->getLineItems($order, $orderItems, $coupon);
+
+                // Create the Stripe Checkout session
+                $sessionId = $this->createStripeCheckoutSession($lineItems);
+
+                $payment->setLineItems($lineItems);
+                $payment->setStripeSessionId($sessionId);
+
+                $this->entityManager->persist($payment);
+                $this->entityManager->flush();
+
+                // If there is coupon, regenerate the session id and send it
+                return ['stripeSessionId' => $sessionId];
+            } else {
+                $foundStripeSessionId = $payment->getStripeSessionId();
+
+                if ($foundStripeSessionId !== null) {
+                    try {
+                        \Stripe\Stripe::setApiKey($this->stripeSecretKey);
+                        $session = Session::retrieve($foundStripeSessionId);
+
+                        if ($session->status === 'open') {
+                            return ['stripeSessionId' => $foundStripeSessionId];
+                        }
+                    } catch (ApiErrorException $e) {
+                        $this->activityLogService->storeLog(ActivityLog::STRIPE_API_ERROR);
+                        return ['error' => $e->getMessage()];
+                    }
+                }
+            }
+
+        }
 
         // Check if there are order items to process
         if (empty($orderItems)) {

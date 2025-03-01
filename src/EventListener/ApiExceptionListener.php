@@ -6,6 +6,7 @@ namespace App\EventListener;
 
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use App\Exception\MaxShippingAddressReachedException;
+use App\Exception\PendingOrderNotFoundException;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,6 +21,15 @@ class ApiExceptionListener implements EventSubscriberInterface
     {
         $exception = $event->getThrowable();
         $response  = null;
+
+        // If no pending order is found
+        if ($exception instanceof PendingOrderNotFoundException) {
+            $response = new JsonResponse([
+                'success'     => false,
+                'message'     => 'No pending order found.',
+                'description' => 'Please make sure there is pending order before proceeding.',
+            ], 400);
+        }
 
         // For max shippingAddressException
         if ($exception instanceof MaxShippingAddressReachedException) {

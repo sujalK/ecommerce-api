@@ -66,6 +66,8 @@ class ActivityLogFormatter implements ActivityLogFormatterInterface
 
             ActivityLog::CREATE_WISHLIST => 'create wishlist',
             ActivityLog::DELETE_WISHLIST => 'delete wishlist',
+
+            ActivityLog::STRIPE_API_ERROR => 'stripe error',
         };
 
     }
