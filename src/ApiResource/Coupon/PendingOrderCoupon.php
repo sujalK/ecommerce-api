@@ -44,7 +44,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class PendingOrderCoupon
 {
 
-    #[ApiProperty(identifier: true, genId: false)]
+    #[ApiProperty(identifier: true)]
     public ?int $id = null;
 
     #[Assert\Regex (

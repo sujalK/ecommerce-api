@@ -12,6 +12,7 @@ use App\Exception\PendingOrderNotFoundException;
 use App\Repository\OrderRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class RemoveCouponFromPendingOrder implements ProcessorInterface
@@ -53,7 +54,9 @@ class RemoveCouponFromPendingOrder implements ProcessorInterface
             throw new PendingOrderNotFoundException();
         }
 
+        $couponCodeString = '';
         if ($existingOrder->getCouponCode() === null) {
+            $couponCodeString = $existingOrder->getCouponCode();
             return $this->httpResponse->validationErrorResponse([
                 'No coupon code is present.'
             ]);
@@ -64,9 +67,9 @@ class RemoveCouponFromPendingOrder implements ProcessorInterface
         $this->entityManager->persist($existingOrder);
         $this->entityManager->flush();
 
-        return [
+        return new JsonResponse([
             'success'     => true,
-            'description' => 'Coupon code has been removed.',
-        ];
+            'description' => "Coupon code \"{$couponCodeString}\" has been removed.",
+        ], 200);
     }
 }

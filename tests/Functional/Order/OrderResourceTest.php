@@ -7,6 +7,8 @@ namespace App\Tests\Functional\Order;
 use App\Factory\ApiTokenFactory;
 use App\Factory\CartFactory;
 use App\Factory\CartItemFactory;
+use App\Factory\CouponFactory;
+use App\Factory\OrderFactory;
 use App\Factory\ProductFactory;
 use App\Factory\ShippingAddressFactory;
 use App\Factory\ShippingMethodFactory;
@@ -70,6 +72,61 @@ class OrderResourceTest extends KernelTestCase
                  ]
              ])
              ->dump()
+        ;
+
+    }
+
+    public function testPostToAddAndRemoveCouponFromPendingOrder(): void
+    {
+
+        $user = UserFactory::createOne();
+
+        CouponFactory::createOne([
+            'code'                               => 'SUMMER10',
+            'discount_type'                      => 'percentage',
+            'discount_value'                     => 10.00,
+            'max_discount_amount_for_percentage' => 50.00,
+            'applies_to'                         => ['category' => 78], // Ensure this is stored as JSON if needed
+            'minimum_cart_value'                 => 20.00,
+            'start_date'                         => new \DateTime('2024-12-25 08:40:12'),
+            'end_date'                           => new \DateTime('2025-03-28 23:59:59'),
+            'usage_limit'                        => 100,
+            'single_user_limit'                  => 5,
+            'description'                        => '10% off for minimum order of Rs. 5000',
+            'is_active'                          => true,
+        ]);
+
+        $order = OrderFactory::createOne([
+            'ownedBy' => $user,
+        ]);
+
+        $apiToken = ApiTokenFactory::createOne([
+            'expiresAt' => null,
+            'owner'     => $user,
+        ]);
+
+        // Perform testing
+        $this->browser()
+             ->post("/api/orders/{$order->getId()}/apply-coupon", [
+                 'json' => [
+                     'couponCode' => 'SUMMER10'
+                 ],
+                 'headers' => [
+                     'Content-Type'  => 'application/json',
+                     'Authorization' => 'Bearer '. $apiToken->getToken()
+                 ]
+             ])
+             ->assertStatus(200)
+        ;
+
+        // remove Coupon
+        $this->browser()
+             ->post('/api/orders/1/remove-coupon', [
+                 'headers' => [
+                     'Authorization' => 'Bearer '. $apiToken->getToken()
+                 ]
+             ])
+             ->assertStatus(200)
         ;
 
     }

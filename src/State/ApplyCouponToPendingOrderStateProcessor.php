@@ -23,6 +23,7 @@ use App\Service\CouponErrorHandlerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -94,11 +95,11 @@ class ApplyCouponToPendingOrderStateProcessor implements ProcessorInterface
         $this->entityManager->persist($existingOrder);
         $this->entityManager->flush();
 
-        return [
+        return new JsonResponse([
             'discountType'  => $coupon->getDiscountType(),
             'discountValue' => $coupon->getDiscountValue(),
             'appliesTo'     => $coupon->getAppliesTo(),
-        ];
+        ], 200);
     }
 
     public function checkValidity(string $couponCode): Response|Coupon
