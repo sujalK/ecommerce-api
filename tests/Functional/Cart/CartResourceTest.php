@@ -16,7 +16,7 @@ class CartResourceTest extends KernelTestCase
     use ResetDatabase;
     use Factories;
 
-    public function testPostToCreateCart(): void
+    public function testPostToCreateCartForUser(): void
     {
 
         $this->browser()

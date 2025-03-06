@@ -68,7 +68,7 @@ class ApplyCouponToPendingOrderStateProcessor implements ProcessorInterface
             throw new PendingOrderNotFoundException();
         }
 
-        $response = $this->checkValidity($data->couponCode);
+        $response = $this->checkValidity($data->couponCode ?? '');
         if (! $response instanceof Coupon) {
             $this->removeCoupon($existingOrder);
             return $response;
@@ -78,7 +78,7 @@ class ApplyCouponToPendingOrderStateProcessor implements ProcessorInterface
 
         try {
             // check coupon usage
-            $this->checkCouponUsage($data->couponCode, $coupon, $user);
+            $this->checkCouponUsage($data->couponCode ?? '', $coupon, $user);
         } catch ( CouponSingleUserLimitExceededException ) {
             $this->removeCoupon($existingOrder);
             return $this->httpResponse->validationErrorResponse(errors: ['You have already used this coupon the maximum allowed times.']);

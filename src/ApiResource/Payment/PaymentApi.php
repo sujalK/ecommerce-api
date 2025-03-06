@@ -23,7 +23,9 @@ use App\State\PaymentProcessor;
     operations: [
         new Get(),
         new GetCollection(),
-        new Post(),
+        new Post(
+            input: false
+        ),
     ],
     paginationItemsPerPage: 10,
     security: 'is_granted("ROLE_USER")', // Makes sure user is logged-in to perform HTTP operation
