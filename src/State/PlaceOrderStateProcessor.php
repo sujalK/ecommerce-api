@@ -49,7 +49,10 @@ class PlaceOrderStateProcessor implements ProcessorInterface
         try {
             $cart = $this->getCartOfLoggedInUser($user);
         } catch (CartNotFoundException) {
-            return $this->httpResponse->notFoundException();
+            return $this->httpResponse->notFoundException (
+                'Cart not found.',
+                'There is no active cart of a user, so please create a cart before placing an order.',
+            );
         }
 
         // set the owner
