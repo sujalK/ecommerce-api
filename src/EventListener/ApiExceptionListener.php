@@ -11,6 +11,7 @@ use App\Exception\CouponNotFoundException;
 use App\Exception\MaxShippingAddressReachedException;
 use App\Exception\MissingOrderItemsException;
 use App\Exception\PendingOrderNotFoundException;
+use Stripe\Exception\ApiErrorException;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -70,6 +71,17 @@ class ApiExceptionListener implements EventSubscriberInterface
                 'invalidKey'  => $property,
                 'description' => 'Invalid data',
             ], 422);
+        }
+
+        /*
+         * ApiErrorException
+         */
+        if ($exception instanceof ApiErrorException) {
+            $response = new JsonResponse([
+                'statusCode'  => 500,
+                'success'     => false,
+                'message'     => 'Something went wrong.',
+            ], 500);
         }
 
         // For max shippingAddressException

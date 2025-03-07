@@ -138,11 +138,12 @@ class PaymentProcessor implements ProcessorInterface
 
             // return ['error' => 'Coupon expired'];
             throw $e;
-        } catch (CouponNotFoundException) {
+        } catch (CouponNotFoundException $e) {
             // log
             $this->log(log: ActivityLog::COUPON_NOT_FOUND, description: 'Coupon not found');
 
-            return ['error' => 'Coupon not found'];
+            // return ['error' => 'Coupon not found'];
+            throw $e;
         }
 
         // Build line items for Stripe Checkout. Discount is applied per order item.
@@ -207,7 +208,8 @@ class PaymentProcessor implements ProcessorInterface
         } catch (ApiErrorException $e) {
             $this->log(log: ActivityLog::PAYMENT_API_ERROR_EXCEPTION, description: $e->getMessage());
 
-            return ['error' => $e->getMessage()];
+            // return ['error' => $e->getMessage()];
+            throw $e;
         }
 
 //        // Save or update the Payment entity using the generic processor
