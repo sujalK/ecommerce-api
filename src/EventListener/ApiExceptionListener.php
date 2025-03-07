@@ -6,7 +6,10 @@ namespace App\EventListener;
 
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Validator\Exception\ValidationException;
+use App\Exception\CouponExpiredException;
+use App\Exception\CouponNotFoundException;
 use App\Exception\MaxShippingAddressReachedException;
+use App\Exception\MissingOrderItemsException;
 use App\Exception\PendingOrderNotFoundException;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -23,6 +26,41 @@ class ApiExceptionListener implements EventSubscriberInterface
         $exception = $event->getThrowable();
         $response  = null;
 
+        /*
+         * PaymentProcessor-specific Exceptions
+         */
+        if ($exception instanceof CouponNotFoundException) {
+            $response = new JsonResponse([
+                'statusCode' => 400,
+                'success'    => false,
+                'message'    => 'Coupon not found',
+            ], 400);
+        }
+
+        if ($exception instanceof CouponExpiredException) {
+            $response = new JsonResponse([
+                'statusCode' => 422,
+                'success'    => false,
+                'message'    => 'Coupon is expired.',
+            ], 422);
+        }
+
+        if ($exception instanceof MissingOrderItemsException) {
+            $response = new JsonResponse([
+                'statusCode' => 400,
+                'success'    => false,
+                'message'    => 'No order items found for this order.',
+            ], 400);
+        }
+
+        if ($exception instanceof PendingOrderNotFoundException) {
+            $response = new JsonResponse([
+                'statusCode' => 400,
+                'success'    => false,
+                'message'    => 'Pending order not found.',
+            ], 404);
+        }
+
         if ($exception instanceof ValidationException) {
             $property = explode(':', $exception->getMessage())[0];
 
@@ -32,15 +70,6 @@ class ApiExceptionListener implements EventSubscriberInterface
                 'invalidKey'  => $property,
                 'description' => 'Invalid data',
             ], 422);
-        }
-
-        // If no pending order is found
-        if ($exception instanceof PendingOrderNotFoundException) {
-            $response = new JsonResponse([
-                'success'     => false,
-                'message'     => 'No pending order found.',
-                'description' => 'Please make sure there is pending order before proceeding.',
-            ], 400);
         }
 
         // For max shippingAddressException
