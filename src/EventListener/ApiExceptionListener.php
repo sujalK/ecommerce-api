@@ -6,8 +6,12 @@ namespace App\EventListener;
 
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Validator\Exception\ValidationException;
+use App\Exception\CouponExpiredException;
+use App\Exception\CouponNotFoundException;
 use App\Exception\MaxShippingAddressReachedException;
+use App\Exception\MissingOrderItemsException;
 use App\Exception\PendingOrderNotFoundException;
+use Stripe\Exception\ApiErrorException;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,6 +27,41 @@ class ApiExceptionListener implements EventSubscriberInterface
         $exception = $event->getThrowable();
         $response  = null;
 
+        /*
+         * PaymentProcessor-specific Exceptions
+         */
+        if ($exception instanceof CouponNotFoundException) {
+            $response = new JsonResponse([
+                'statusCode' => 400,
+                'success'    => false,
+                'message'    => 'Coupon not found',
+            ], 400);
+        }
+
+        if ($exception instanceof CouponExpiredException) {
+            $response = new JsonResponse([
+                'statusCode' => 422,
+                'success'    => false,
+                'message'    => 'Coupon is expired.',
+            ], 422);
+        }
+
+        if ($exception instanceof MissingOrderItemsException) {
+            $response = new JsonResponse([
+                'statusCode' => 400,
+                'success'    => false,
+                'message'    => 'No order items found for this order.',
+            ], 400);
+        }
+
+        if ($exception instanceof PendingOrderNotFoundException) {
+            $response = new JsonResponse([
+                'statusCode' => 400,
+                'success'    => false,
+                'message'    => 'Pending order not found.',
+            ], 404);
+        }
+
         if ($exception instanceof ValidationException) {
             $property = explode(':', $exception->getMessage())[0];
 
@@ -34,13 +73,15 @@ class ApiExceptionListener implements EventSubscriberInterface
             ], 422);
         }
 
-        // If no pending order is found
-        if ($exception instanceof PendingOrderNotFoundException) {
+        /*
+         * ApiErrorException
+         */
+        if ($exception instanceof ApiErrorException) {
             $response = new JsonResponse([
+                'statusCode'  => 500,
                 'success'     => false,
-                'message'     => 'No pending order found.',
-                'description' => 'Please make sure there is pending order before proceeding.',
-            ], 400);
+                'message'     => 'Something went wrong.',
+            ], 500);
         }
 
         // For max shippingAddressException

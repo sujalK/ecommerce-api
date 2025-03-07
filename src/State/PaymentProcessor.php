@@ -15,6 +15,7 @@ use App\Entity\User;
 use App\Enum\ActivityLog;
 use App\Exception\CouponExpiredException;
 use App\Exception\CouponNotFoundException;
+use App\Exception\MissingOrderItemsException;
 use App\Exception\PendingOrderNotFoundException;
 use App\Repository\CouponRepository;
 use App\Repository\OrderItemRepository;
@@ -82,10 +83,12 @@ class PaymentProcessor implements ProcessorInterface
                     $coupon = $this->validateAndGetCoupon($order);
                 } catch (CouponNotFoundException $e) {
                     $this->activityLogService->storeLog(ActivityLog::COUPON_NOT_FOUND);
-                    return ['error' => 'Coupon not found'];
+                    // return ['error' => 'Coupon not found'];
+                    throw $e;
                 } catch (CouponExpiredException $e) {
                     $this->activityLogService->storeLog(ActivityLog::COUPON_EXPIRED);
-                    return ['error' => 'Coupon expired'];
+                    // return ['error' => 'Coupon expired'];
+                    throw $e;
                 }
 
                 $lineItems = $this->getLineItems($order, $orderItems, $coupon);
@@ -123,22 +126,24 @@ class PaymentProcessor implements ProcessorInterface
 
         // Check if there are order items to process
         if (empty($orderItems)) {
-            throw new \Exception('No order items found for this order.');
+            throw new MissingOrderItemsException();
         }
 
         try {
             // Validate coupon and get coupon object (if any). If not valid, no discount is applied.
             $coupon = $this->validateAndGetCoupon($order);
-        } catch (CouponExpiredException) {
+        } catch (CouponExpiredException $e) {
             // log
             $this->log(log: ActivityLog::COUPON_EXPIRED, description: 'Coupon Expired');
 
-            return ['error' => 'Coupon expired'];
-        } catch (CouponNotFoundException) {
+            // return ['error' => 'Coupon expired'];
+            throw $e;
+        } catch (CouponNotFoundException $e) {
             // log
             $this->log(log: ActivityLog::COUPON_NOT_FOUND, description: 'Coupon not found');
 
-            return ['error' => 'Coupon not found'];
+            // return ['error' => 'Coupon not found'];
+            throw $e;
         }
 
         // Build line items for Stripe Checkout. Discount is applied per order item.
@@ -203,7 +208,8 @@ class PaymentProcessor implements ProcessorInterface
         } catch (ApiErrorException $e) {
             $this->log(log: ActivityLog::PAYMENT_API_ERROR_EXCEPTION, description: $e->getMessage());
 
-            return ['error' => $e->getMessage()];
+            // return ['error' => $e->getMessage()];
+            throw $e;
         }
 
 //        // Save or update the Payment entity using the generic processor
