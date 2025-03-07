@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\EventListener;
 
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
+use ApiPlatform\Validator\Exception\ValidationException;
 use App\Exception\MaxShippingAddressReachedException;
 use App\Exception\PendingOrderNotFoundException;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -21,6 +22,17 @@ class ApiExceptionListener implements EventSubscriberInterface
     {
         $exception = $event->getThrowable();
         $response  = null;
+
+        if ($exception instanceof ValidationException) {
+            $property = explode(':', $exception->getMessage())[0];
+
+            $response = new JsonResponse([
+                'success'     => false,
+                'message'     => $exception->getMessage(),
+                'invalidKey'  => $property,
+                'description' => 'Invalid data',
+            ], 422);
+        }
 
         // If no pending order is found
         if ($exception instanceof PendingOrderNotFoundException) {

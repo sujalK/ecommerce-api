@@ -38,7 +38,6 @@ class DiscountApi
      * Coupon code that the user enters to set coupon code into order table and also set discount amount
      */
     #[Assert\NotBlank(groups: ['postValidation'])]
-    #[Assert\NotNull(groups: ['postValidation'])]
     #[Assert\Regex (
         pattern: "/^[a-zA-Z0-9]+$/",
         message: 'This field should only contain numbers and alphabets.',
