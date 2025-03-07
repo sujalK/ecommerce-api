@@ -10,9 +10,11 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\ApiResource\Order\OrderApi;
+use App\Entity\Order;
 use App\Entity\Payment;
 use App\State\EntityToDtoStateProvider;
 use App\State\PaymentProcessor;
@@ -26,6 +28,11 @@ use App\State\PaymentProcessor;
         new Post(
             input: false
         ),
+        new Post (
+            uriTemplate: '/payments/{id}',
+            input: false,
+            processor: PaymentProcessor::class
+        )
     ],
     paginationItemsPerPage: 10,
     security: 'is_granted("ROLE_USER")', // Makes sure user is logged-in to perform HTTP operation

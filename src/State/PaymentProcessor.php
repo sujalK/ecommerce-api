@@ -7,6 +7,7 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Order\OrderApi;
+use App\ApiResource\Payment\PaymentApi;
 use App\Entity\Coupon;
 use App\Entity\Order;
 use App\Entity\OrderItem;
@@ -49,9 +50,15 @@ class PaymentProcessor implements ProcessorInterface
     {
         /** @var User $user Get the logged-in user */
         $user = $this->security->getUser();
+        $data = $data ?? new PaymentApi();
 
-        // Fetch the order by the owned_by_id (user ID) and order ID
-        $order = isset($user) ? $this->orderRepository->findOneBy (criteria: ['ownedBy' => $user, 'status'  => 'pending'], orderBy:  ['createdAt' => 'DESC']) : null;
+        if (str_ends_with($operation->getName(), '/payments/{id}_post')) {
+            $id    = $uriVariables['id'];
+            $order = isset($user) ? $this->orderRepository->findOneBy (criteria: ['id' => $id, 'ownedBy' => $user, 'status'  => 'pending']) : null;;
+        } else {
+            // Fetch the order by the owned_by_id (user ID) and order ID
+            $order = isset($user) ? $this->orderRepository->findOneBy (criteria: ['ownedBy' => $user, 'status'  => 'pending'], orderBy:  ['createdAt' => 'DESC']) : null;
+        }
 
         // Check if order is found and its status is "placed"
         if ($order === null || $order->getStatus() !== 'pending') {
@@ -124,12 +131,12 @@ class PaymentProcessor implements ProcessorInterface
             $coupon = $this->validateAndGetCoupon($order);
         } catch (CouponExpiredException) {
             // log
-            $this->log(ActivityLog::COUPON_EXPIRED, 'Coupon Expired');
+            $this->log(log: ActivityLog::COUPON_EXPIRED, description: 'Coupon Expired');
 
             return ['error' => 'Coupon expired'];
         } catch (CouponNotFoundException) {
             // log
-            $this->log(ActivityLog::COUPON_NOT_FOUND, 'Coupon not found');
+            $this->log(log: ActivityLog::COUPON_NOT_FOUND, description: 'Coupon not found');
 
             return ['error' => 'Coupon not found'];
         }
@@ -159,8 +166,9 @@ class PaymentProcessor implements ProcessorInterface
                 $payment->setStripeSessionId($sessionId);
                 $this->entityManager->flush();
 
+
                 // log
-                $this->log(ActivityLog::INIT_COUPON_CODE_BASED_PAYMENT, $sessionId);
+                $this->log(log: ActivityLog::INIT_COUPON_CODE_BASED_PAYMENT, sessionId: $sessionId);
 
                 return ['stripeSessionId' => $sessionId];
             }
@@ -172,8 +180,9 @@ class PaymentProcessor implements ProcessorInterface
                 $session = Session::retrieve($existingSessionId);
 
                 if ($session->status !== 'expired' && $session->status !== 'canceled') {
+
                     // log
-                    $this->log(ActivityLog::INITIALIZE_TO_PROCESS_PAYMENT, $existingSessionId);
+                    $this->log(log: ActivityLog::INITIALIZE_TO_PROCESS_PAYMENT, sessionId: $existingSessionId);
 
                     // Reuse the existing session
                     return ['stripeSessionId' => $existingSessionId];
@@ -182,15 +191,17 @@ class PaymentProcessor implements ProcessorInterface
                     $payment->setStripeSessionId($sessionId);
                     $this->entityManager->flush();
 
+
+                    // dd(123);
                     // log
-                    $this->log(ActivityLog::RESUME_NON_COUPON_BASED_EXISTING_PAYMENT, $sessionId);
+                    $this->log(log: ActivityLog::RESUME_NON_COUPON_BASED_EXISTING_PAYMENT, sessionId: $sessionId);
 
                     return ['stripeSessionId' => $sessionId];
                 }
             }
 
         } catch (ApiErrorException $e) {
-            $this->log(ActivityLog::PAYMENT_API_ERROR_EXCEPTION, $e->getMessage());
+            $this->log(log: ActivityLog::PAYMENT_API_ERROR_EXCEPTION, description: $e->getMessage());
 
             return ['error' => $e->getMessage()];
         }
@@ -355,7 +366,7 @@ class PaymentProcessor implements ProcessorInterface
         return false;
     }
 
-    public function log(ActivityLog $log, string $description, string $sessionId = ''): void
+    public function log(ActivityLog $log, ?string $description = null, string $sessionId = ''): void
     {
         $object = new \stdClass();
         $object->stripeSessionId = $sessionId   ?: null;
