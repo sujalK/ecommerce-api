@@ -20,14 +20,8 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName: 'Cart',
     description: 'Cart of a user',
     operations: [
-        new GetCollection(
-            // we only allow admins to see all the carts (list of carts) because GET operation can view the cart for a single user
-            security: 'is_granted("ROLE_ADMIN")'
-        ),
-        new Get (
-            // GET the single cart, and cart lists all cart Items associated to the cart
-            security: 'is_granted("VIEW", object)'
-        ),
+        new GetCollection(),
+        new Get (),
 //        new Post (
 //            security: 'is_granted("ADD", object)',
 //        ),
@@ -37,6 +31,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 //        ),
     ],
     paginationItemsPerPage: 10,
+    security: 'is_granted("ROLE_USER")',
     provider: EntityToDtoStateProvider::class,
     stateOptions: new Options(entityClass: Cart::class)
 )]

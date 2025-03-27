@@ -122,7 +122,7 @@ class Coupon
         return $this->minimumCartValue;
     }
 
-    public function setMinimumCartValue(string $minimumCartValue): static
+    public function setMinimumCartValue(?string $minimumCartValue): static
     {
         $this->minimumCartValue = $minimumCartValue;
 
@@ -194,7 +194,7 @@ class Coupon
         return $this->isActive;
     }
 
-    public function setIsActive(bool $isActive): static
+    public function setActive(bool $isActive): static
     {
         $this->isActive = $isActive;
 

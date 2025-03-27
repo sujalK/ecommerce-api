@@ -33,12 +33,13 @@ class UserEntityToApiMapper implements MapperInterface
         assert($dto instanceof UserApi);
 
         // map to the dto
-        $dto->email               = $from->getEmail();
-        $dto->userName            = $from->getUsername();
-        $dto->firstName           = $from->getFirstName();
-        $dto->lastName            = $from->getLastName();
-        $dto->accountActiveStatus = $from->getAccountActiveStatus();
-        $dto->verificationStatus  = $from->getVerificationStatus();
+        $dto->email      = $entity->getEmail();
+        $dto->userName   = $entity->getUserName();
+        $dto->firstName  = $entity->getFirstName();
+        $dto->lastName   = $entity->getLastName();
+        $dto->isActive   = $entity->getIsActive();
+        $dto->isVerified = $entity->getIsVerified();
+        $dto->roles      = $entity->getRoles();
 
 //        $dto->carts               = $entity->getCarts();
 //        $dto->shippingAddresses   = $entity->getShippingAddresses();

@@ -16,6 +16,7 @@ final class UserVoter extends Voter
 
     public const string EDIT   = 'EDIT';
     public const string DELETE = 'DELETE';
+    public const string VIEW   = 'VIEW';
 
     public function __construct (
         private readonly Security $security,
@@ -25,7 +26,7 @@ final class UserVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return in_array($attribute, [self::EDIT, self::DELETE])
+        return in_array($attribute, [self::VIEW, self::EDIT, self::DELETE])
             && $subject instanceof UserApi;
     }
 
@@ -38,12 +39,17 @@ final class UserVoter extends Voter
             return false;
         }
 
+        if ($this->security->isGranted('ROLE_ADMIN')) {
+            return true;
+        }
+
         $user = $this->security->getUser();
         assert($user instanceof User);
         assert($subject instanceof UserApi);
 
         // ... (check conditions and return true to grant permission) ...
         switch ($attribute) {
+            case self::VIEW:
             case self::DELETE:
             case self::EDIT:
 

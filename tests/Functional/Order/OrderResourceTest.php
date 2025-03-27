@@ -131,4 +131,28 @@ class OrderResourceTest extends KernelTestCase
 
     }
 
+    public function testOwnerCanOnlyFetchOrder(): void
+    {
+
+        $user  = UserFactory::createOne();
+        $token = ApiTokenFactory::createOne([
+            'owner'     => $user,
+            'expiresAt' => null,
+        ]);
+
+        $order = OrderFactory::createOne([
+            'ownedBy' => $user,
+        ]);
+
+        $this->browser()
+             ->get('/api/orders/'. $order->getId(), [
+                 'headers' => [
+                     'Authorization' => 'Bearer '. $token->getToken(),
+                     'Accept'        => 'application/json',
+                 ]
+             ])
+             ->assertStatus(200);
+
+    }
+
 }

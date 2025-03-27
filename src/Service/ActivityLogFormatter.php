@@ -68,6 +68,14 @@ class ActivityLogFormatter implements ActivityLogFormatterInterface
             ActivityLog::DELETE_WISHLIST => 'delete wishlist',
 
             ActivityLog::STRIPE_API_ERROR => 'stripe error',
+
+            ActivityLog::DELETE_PRODUCT => 'delete product',
+            ActivityLog::CREATE_SHIPPING_ADDRESS => 'create shipping address',
+            ActivityLog::UPDATE_SHIPPING_ADDRESS => 'update shipping address',
+            ActivityLog::DELETE_SHIPPING_ADDRESS => 'delete shipping address',
+            ActivityLog::CREATE_SHIPPING_METHOD  => 'create shipping method',
+            ActivityLog::UPDATE_SHIPPING_METHOD  => 'update shipping method',
+            ActivityLog::DELETE_SHIPPING_METHOD  => 'delete shipping method',
         };
 
     }

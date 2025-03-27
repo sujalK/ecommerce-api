@@ -62,6 +62,7 @@ class RemoveCouponFromPendingOrder implements ProcessorInterface
             ]);
         }
 
+        $tempCouponCode = $existingOrder->getCouponCode();
         $existingOrder->setCouponCode(null);
 
         $this->entityManager->persist($existingOrder);
@@ -69,7 +70,7 @@ class RemoveCouponFromPendingOrder implements ProcessorInterface
 
         return new JsonResponse([
             'success'     => true,
-            'description' => "Coupon code \"{$couponCodeString}\" has been removed.",
+            'description' => 'Coupon code '. $tempCouponCode .' has been removed.',
         ], 200);
     }
 }

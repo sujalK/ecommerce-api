@@ -4,54 +4,30 @@ declare(strict_types = 1);
 
 namespace App\ApiResource\Coupon;
 
-use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Link;
-use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use App\Entity\Order;
+use App\DataObjects\ApplyPendingOrderDiscountData;
 use App\State\ApplyCouponToPendingOrderStateProcessor;
 use App\State\RemoveCouponFromPendingOrder;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     shortName: 'OrderCoupon',
     operations: [
         new Post (
             uriTemplate: '/orders/{orderId}/apply-coupon',
-            uriVariables: [
-                'orderId' => new Link (
-                    fromProperty: 'id',
-                    fromClass: Order::class,
-                )
-            ],
+            status: 200,
+            input: ApplyPendingOrderDiscountData::class,
+            provider: null,
             processor: ApplyCouponToPendingOrderStateProcessor::class
         ),
         new Post (
             uriTemplate: '/orders/{orderId}/remove-coupon',
-            uriVariables: [
-                'orderId' => new Link (
-                    fromProperty: 'id',
-                    fromClass: Order::class,
-                )
-            ],
+            status: 200,
             input: false,
+            provider: null,
             processor: RemoveCouponFromPendingOrder::class
         )
     ],
     security: 'is_granted("ROLE_USER")',
 )]
-class PendingOrderCoupon
-{
-
-    #[ApiProperty(identifier: true)]
-    public ?int $id = null;
-
-    #[Assert\Regex (
-        pattern: '/^[a-zA-Z0-9]+$/',
-        message: 'Invalid coupon code.',
-    )]
-    #[ApiProperty(readable: true, writable: true)]
-    public ?string $couponCode = null;
-
-}
+class PendingOrderCoupon {}

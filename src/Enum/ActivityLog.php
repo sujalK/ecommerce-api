@@ -117,6 +117,7 @@ enum ActivityLog: string
             self::LOGGED_IN        => 'logged in into the system.',
             self::LOGGED_OUT       => 'logged out from the system',
             self::ADD_TO_INVENTORY => 'added item to inventory.',
+            self::DELETE_PRODUCT   => 'delete product',
             self::DELETE_CART_ITEM => $this->getDeleteCartItemDescription(),
         };
     }

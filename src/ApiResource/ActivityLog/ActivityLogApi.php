@@ -27,7 +27,7 @@ use App\State\EntityToDtoStateProvider;
         'json'   => ['application/json'],
         'jsonld' => ['application/ld+json']
     ],
-    paginationItemsPerPage: 5,
+    paginationItemsPerPage: 10,
     security: 'is_granted("ROLE_USER")', // User needs to be logged-in to access this resource,
     provider: EntityToDtoStateProvider::class,
     processor: DtoToEntityStateProcessor::class,
@@ -36,7 +36,7 @@ use App\State\EntityToDtoStateProvider;
 class ActivityLogApi
 {
 
-    #[ApiProperty(readable: false, writable: false, identifier: true)]
+    #[ApiProperty(readable: true, writable: false, identifier: true)]
     public ?int $id                       = null;
 
     public ?UserApi $owner                = null;
@@ -46,5 +46,19 @@ class ActivityLogApi
     public ?string $description           = null;
 
     public ?\DateTimeImmutable $createdAt = null;
+
+    /*
+     * isLoggedInAdminLog
+     * This field is visible only if admin is logged-in and owner of the log is logged-in user (admin)
+     */
+    #[ApiProperty(writable: false, security: '(object.owner.id === user.getId()) and is_granted("ROLE_ADMIN")')]
+    public ?bool $isLoggedInAdminLog = true;
+
+    /*
+     * isMine property is returned to indicate the ActivityLog belongs to the logged-in user.
+     * This property is only returned if ActivityLog belongs to the logged-in user.
+     */
+    #[ApiProperty(writable: false, security: 'object.owner.id === user.getId()')]
+    public ?bool $isMine = true;
 
 }

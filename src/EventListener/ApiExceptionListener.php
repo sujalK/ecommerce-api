@@ -13,6 +13,7 @@ use App\Exception\MissingOrderItemsException;
 use App\Exception\PendingOrderNotFoundException;
 use Stripe\Exception\ApiErrorException;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -26,6 +27,17 @@ class ApiExceptionListener implements EventSubscriberInterface
     {
         $exception = $event->getThrowable();
         $response  = null;
+
+        /*
+         * For HttpException, for non-authenticated user
+         */
+        if ( $exception instanceof HttpException ) {
+            $response = new JsonResponse([
+                'statusCode' => $exception->getStatusCode(),
+                'success'    => false,
+                'message'    => $exception->getMessage(),
+            ]);
+        }
 
         /*
          * PaymentProcessor-specific Exceptions
@@ -56,7 +68,7 @@ class ApiExceptionListener implements EventSubscriberInterface
 
         if ($exception instanceof PendingOrderNotFoundException) {
             $response = new JsonResponse([
-                'statusCode' => 400,
+                'statusCode' => 404,
                 'success'    => false,
                 'message'    => 'Pending order not found.',
             ], 404);
@@ -68,7 +80,7 @@ class ApiExceptionListener implements EventSubscriberInterface
             $response = new JsonResponse([
                 'success'     => false,
                 'message'     => $exception->getMessage(),
-                'invalidKey'  => $property,
+                'invalidKey'  => $property === $exception->getMessage() ? 'n/a' : $property,
                 'description' => 'Invalid data',
             ], 422);
         }

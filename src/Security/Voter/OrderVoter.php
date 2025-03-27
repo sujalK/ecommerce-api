@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Security\Voter;
 
 use App\ApiResource\Order\OrderApi;
-use App\Entity\Order;
 use App\Entity\User;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -13,6 +14,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 final class OrderVoter extends Voter
 {
     public const string POST = 'POST';
+    public const string VIEW = 'VIEW';
 
     public function __construct (
         private readonly Security $security,
@@ -22,7 +24,7 @@ final class OrderVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return in_array($attribute, [self::POST])
+        return in_array($attribute, [self::POST, self::VIEW])
             && $subject instanceof OrderApi;
     }
 
@@ -46,12 +48,11 @@ final class OrderVoter extends Voter
         // ... (check conditions and return true to grant permission) ...
         switch ($attribute) {
             case self::POST:
+            case self::VIEW:
 
                 if ($subject->ownedBy->id === $user->getId()) {
                     return true;
                 }
-
-                break;
         }
 
         return false;

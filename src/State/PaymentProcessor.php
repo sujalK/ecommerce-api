@@ -53,13 +53,16 @@ class PaymentProcessor implements ProcessorInterface
         $user = $this->security->getUser();
         $data = $data ?? new PaymentApi();
 
-        if (str_ends_with($operation->getName(), '/payments/{id}_post')) {
-            $id    = $uriVariables['id'];
-            $order = isset($user) ? $this->orderRepository->findOneBy (criteria: ['id' => $id, 'ownedBy' => $user, 'status'  => 'pending']) : null;;
-        } else {
-            // Fetch the order by the owned_by_id (user ID) and order ID
-            $order = isset($user) ? $this->orderRepository->findOneBy (criteria: ['ownedBy' => $user, 'status'  => 'pending'], orderBy:  ['createdAt' => 'DESC']) : null;
-        }
+        // DOES NOT ALLOW ADMIN TO PROCESS ORDER FROM HERE, as below code $order === null will run in admin case, because of ownedBy => $user
+        $order = isset($user) ? $this->orderRepository->findOneBy (criteria: ['id' => $data->order->id, 'ownedBy' => $user, 'status'  => 'pending']) : null;
+
+//        if (str_ends_with($operation->getName(), '/payments/{id}_post')) {
+//            $id    = $uriVariables['id'];
+//            $order = isset($user) ? $this->orderRepository->findOneBy (criteria: ['id' => $id, 'ownedBy' => $user, 'status'  => 'pending']) : null;
+//        } else {
+//            // Fetch the order by the owned_by_id (user ID) and order ID
+//            $order = isset($user) ? $this->orderRepository->findOneBy (criteria: ['ownedBy' => $user, 'status'  => 'pending'], orderBy:  ['createdAt' => 'DESC']) : null;
+//        }
 
         // Check if order is found and its status is "placed"
         if ($order === null || $order->getStatus() !== 'pending') {

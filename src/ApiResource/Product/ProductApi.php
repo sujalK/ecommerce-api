@@ -60,7 +60,7 @@ class ProductApi
     #[Assert\NotBlank]
     #[Assert\Length(min: 2, max: 100)]
     #[Assert\Regex(
-        pattern: '/^[a-zA-Z0-9 ]+$/',
+        pattern: '/^[a-zA-Z0-9 \-]+$/',
         message: 'The product name can only contain letters, numbers, and spaces.'
     )]
     public ?string $name                  = null;

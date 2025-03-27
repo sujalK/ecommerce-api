@@ -39,6 +39,9 @@ class ProductReviewStateProcessor implements ProcessorInterface
         if ($operation instanceof Patch) {
             // set the updatedAt
             $data->updatedAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+
+            // make inactive after edit review, so that admin can again approve the review.
+            $data->isActive = false;
         }
 
         if ($operation instanceof Post) {

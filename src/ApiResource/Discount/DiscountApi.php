@@ -6,6 +6,7 @@ namespace App\ApiResource\Discount;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\State\ApplyCouponStateProcessor;
 use App\State\RemoveCouponStateProcessor;
@@ -15,12 +16,12 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName: 'Discount',
     description: 'Applies discount to the Order (set coupon code) and set discount amount on order_item',
     operations: [
-        new Post (
+        new Patch (
             uriTemplate: '/apply-discount',
             validationContext: ['groups' => ['Default', 'postValidation']],
             processor: ApplyCouponStateProcessor::class,
         ),
-        new Post (
+        new Patch (
             uriTemplate: '/remove-coupon',
             input: false, // Disables the deserialization for the remove-coupon operation
             processor: RemoveCouponStateProcessor::class,

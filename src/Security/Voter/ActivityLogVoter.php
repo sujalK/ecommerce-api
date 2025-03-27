@@ -10,7 +10,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 final class ActivityLogVoter extends Voter
 {
-    public const VIEW = 'ACTIVITY_LOG_VIEW';
+    public const string VIEW = 'ACTIVITY_LOG_VIEW';
 
     public function __construct(
         private readonly Security $security,

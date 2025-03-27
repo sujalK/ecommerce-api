@@ -48,7 +48,9 @@ class CouponApiToEntityMapper implements MapperInterface
         $entity->setDiscountValue($dto->discountValue);
         $entity->setMaxDiscountAmountForPercentage($dto->maxDiscountAmountForPercentage);
         $entity->setAppliesTo($dto->appliesTo);
-        $entity->setMinimumCartValue($dto->minimumCartValue);
+        if ($dto->minimumCartValue) {
+            $entity->setMinimumCartValue($dto->minimumCartValue);
+        }
         $entity->setStartDate($dto->startDate);
         $entity->setEndDate($dto->endDate);
         $entity->setUsageLimit($dto->usageLimit);

@@ -17,6 +17,7 @@ use App\Entity\Inventory;
 use App\State\EntityToDtoStateProvider;
 use App\State\InventoryStateProcessor;
 use App\Validator\IsUniqueProductInInventory;
+use App\Validator\NotAllowedProductChangeInInventory;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource (
@@ -28,7 +29,9 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Post (
             validationContext: ['groups' => ['Default', 'postValidation']],
         ),
-        new Patch(),
+        new Patch(
+            validationContext: ['groups' => ['Default', 'patchValidation']],
+        ),
         new Delete(),
     ],
     paginationItemsPerPage: 10,
@@ -39,6 +42,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     processor: InventoryStateProcessor::class,
     stateOptions: new Options(entityClass: Inventory::class),
 )]
+#[NotAllowedProductChangeInInventory(groups: ['patchValidation'])]
 class InventoryApi
 {
     #[ApiProperty(readable: true, writable: false, identifier: true)]

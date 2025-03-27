@@ -53,7 +53,7 @@ class ProductCategoryApi
 
     #[NotBlank(groups: ['postValidation'])]
     #[Assert\Regex(
-        pattern: '/^[a-zA-Z0-9 ]+$/',
+        pattern: '/^[a-zA-Z0-9 \-\.]+$/',
         message: 'Please make sure to enter a valid category name.',
     )]
     #[IsUniqueCategory(groups: ['postValidation'])]

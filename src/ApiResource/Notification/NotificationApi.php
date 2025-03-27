@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\ApiResource\User\UserApi;
 use App\Entity\Notification;
@@ -25,8 +26,13 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName: 'Notification',
     description: 'Notification inside the system',
     operations: [
-        new Get(),
+        new Get (
+            security: 'is_granted("VIEW", object)'
+        ),
         new GetCollection(),
+        new Patch (
+            security: 'is_granted("EDIT", object)'
+        ),
         new Post(
             security: 'is_granted("ROLE_ADMIN")',
             validationContext: ['groups' => ['Default', 'postValidation']],

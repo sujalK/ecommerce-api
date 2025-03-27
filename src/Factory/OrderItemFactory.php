@@ -33,8 +33,6 @@ final class OrderItemFactory extends PersistentProxyObjectFactory
     {
         return [
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
-            'discountAmount' => self::faker()->randomFloat(),
-            'parentOrder' => OrderFactory::new(),
             'product' => ProductFactory::new(),
             'quantity' => self::faker()->randomNumber(),
             'totalPrice' => self::faker()->randomFloat(),

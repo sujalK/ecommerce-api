@@ -127,7 +127,7 @@ class ProductCreationService
             'category'     => '/api/categories/' . $categoryId,
             'isActive'     => $product->isActive(),
             'productImage' => "https://{$this->environmentVariablesService->get(EnvVars::BUCKET_NAME)}.s3.{$this->environmentVariablesService->get(EnvVars::REGION)}.amazonaws.com/{$fileUploadData->s3FileName}"
-        ], Response::HTTP_OK);
+        ], Response::HTTP_CREATED);
     }
 
     /**

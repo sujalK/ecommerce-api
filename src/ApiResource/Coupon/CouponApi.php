@@ -16,6 +16,7 @@ use App\Entity\Coupon;
 use App\State\CouponStateProcessor;
 use App\State\DtoToEntityStateProcessor;
 use App\State\EntityToDtoStateProvider;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource (
@@ -42,6 +43,11 @@ use Symfony\Component\Validator\Constraints as Assert;
     provider: EntityToDtoStateProvider::class,
     processor: CouponStateProcessor::class,
     stateOptions: new Options(entityClass: Coupon::class)
+)]
+#[UniqueEntity(
+    fields: ['code'],
+    message: 'The coupon "code" must be unique.',
+    entityClass: Coupon::class, groups: ['postValidation']
 )]
 class CouponApi
 {
@@ -89,7 +95,7 @@ class CouponApi
 
     #[Assert\NotBlank(groups: ['postValidation'])]
     #[Assert\Regex(
-        pattern: '/^[a-zA-Z0-9 \.\-]+$/',
+        pattern: '/^[a-zA-Z0-9 \.\-$%]+$/',
     )]
     public ?string $description                    = null;
 

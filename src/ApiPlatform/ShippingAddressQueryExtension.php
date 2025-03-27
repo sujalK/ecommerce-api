@@ -29,12 +29,30 @@ class ShippingAddressQueryExtension implements QueryCollectionExtensionInterface
 
     public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, ?Operation $operation = null, array $context = []): void
     {
+        // For GET operation, skip filtering, because if non-owner tries to fetch it, it returns a "403 Forbidden", but if
+        // owner tries to fetch it, it defaults to provider (without need of filtering here)
+        if (str_ends_with($operation->getName(), '_get')) {
+            return;
+        }
+
+        if (str_ends_with($operation->getName(), '_patch')) {
+            return;
+        }
+
+        if (str_ends_with($operation->getName(), '_delete')) {
+            return;
+        }
+
         $this->applyOwnerAccessFiltration($resourceClass, $queryBuilder);
     }
 
     public function applyOwnerAccessFiltration(string $resourceClass, QueryBuilder $queryBuilder): void
     {
         if ($resourceClass !== ShippingAddress::class) {
+            return;
+        }
+
+        if ($this->security->isGranted('ROLE_ADMIN')) {
             return;
         }
 

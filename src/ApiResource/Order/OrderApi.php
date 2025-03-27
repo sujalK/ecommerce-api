@@ -25,8 +25,12 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName: 'Order',
     description: 'Order placed by the user',
     operations: [
-        new Get(),
-        new GetCollection(),
+        new Get (
+            security: 'is_granted("VIEW", object)'
+        ),
+        new GetCollection(
+            security: 'is_granted("VIEW", object)'
+        ),
         new Post (
             processor: PlaceOrderStateProcessor::class,
         ),

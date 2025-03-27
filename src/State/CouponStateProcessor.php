@@ -27,19 +27,19 @@ class CouponStateProcessor implements ProcessorInterface
         $entity = $this->processor->process($data, $operation, $uriVariables, $context);
 
         // log the activity
-        $this->log($operation, $entity);
+        $this->log($operation);
 
         return $entity;
     }
 
-    public function log(Operation $operation, object $entity): void
+    public function log(Operation $operation, ?object $entity = null): void
     {
         if ( $operation instanceof Post ) {
             $this->activityLogService->storeLog(ActivityLog::POST_COUPON, $entity);
         } else if ( $operation instanceof Patch ) {
             $this->activityLogService->storeLog(ActivityLog::UPDATE_COUPON, $entity);
         } else if ( $operation instanceof Delete ) {
-            $this->activityLogService->storeLog(ActivityLog::DELETE_COUPON, $entity);
+            $this->activityLogService->storeLog(ActivityLog::DELETE_COUPON);
         }
     }
 }

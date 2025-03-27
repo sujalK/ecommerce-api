@@ -12,6 +12,7 @@ use App\Service\ActivityLogService;
 use App\Service\Cart\CartUpdaterService;
 use Doctrine\ORM\EntityNotFoundException;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class CartItemPatchProcessor implements ProcessorInterface
 {

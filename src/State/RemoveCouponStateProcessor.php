@@ -43,11 +43,15 @@ class RemoveCouponStateProcessor implements ProcessorInterface
             return $this->httpResponse->forbiddenResponse();
         }
 
+        if ($cart->getCouponCode() === null) {
+            return $this->httpResponse->invalidDataResponse(errors: ['The coupon is already removed.']);
+        }
+
+        // log the activity (before removing  so that we get the actual coupon code logged-in into the database)
+        $this->log($cart);
+
         $cart->setCouponCode(null);
         $cart->setUpdatedAt(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
-
-        // log the activity
-        $this->log($cart);
 
         $this->entityManager->flush();
 

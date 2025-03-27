@@ -14,6 +14,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 final class WishlistVoter extends Voter
 {
     public const string DELETE = 'DELETE';
+    public const string VIEW   = 'VIEW';
 
     public function __construct (
         private readonly Security $security,
@@ -23,7 +24,7 @@ final class WishlistVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return in_array($attribute, [self::DELETE])
+        return in_array($attribute, [self::DELETE, self::VIEW])
             && $subject instanceof WishlistApi;
     }
 
@@ -45,6 +46,7 @@ final class WishlistVoter extends Voter
 
         // ... (check conditions and return true to grant permission) ...
         switch ($attribute) {
+            case self::VIEW:
             case self::DELETE:
 
                 if ( $subject->ownedBy->id === $user->getId() ) {

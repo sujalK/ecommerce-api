@@ -7,31 +7,26 @@ namespace App\ApiResource\Payment;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Link;
-use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\ApiResource\Order\OrderApi;
-use App\Entity\Order;
 use App\Entity\Payment;
 use App\State\EntityToDtoStateProvider;
 use App\State\PaymentProcessor;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 #[ApiResource(
     shortName: 'Payment',
     description: 'Payment resource',
     operations: [
-        new Get(),
-        new GetCollection(),
-        new Post(
-            input: false
+        new Get(
+            security: 'is_granted("VIEW", object)'
         ),
+        new GetCollection(),
         new Post (
-            uriTemplate: '/payments/{id}',
-            input: false,
-            processor: PaymentProcessor::class
+            uriTemplate: '/payments',
+            securityPostDenormalize: 'is_granted("CREATE", object)',
         )
     ],
     paginationItemsPerPage: 10,
@@ -45,7 +40,8 @@ class PaymentApi
     #[ApiProperty(readable: true, writable: false, identifier: true)]
     public ?int $id                         = null;
 
-    #[ApiProperty(writable: false)]
+    #[ApiProperty(writable: true)]
+    #[NotNull]
     public ?OrderApi $order                 = null;
 
     #[ApiProperty(writable: false)]
@@ -69,7 +65,6 @@ class PaymentApi
     #[ApiProperty(writable: false)]
     public ?array $lineItems                = null;
 
-    // Add the Stripe session ID property
     #[ApiProperty(readable: true, writable: false)]
     public ?string $stripeSessionId = null; // The Stripe session ID
 }

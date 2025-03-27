@@ -80,4 +80,7 @@ class CartItemApi
 
     public ?string $totalPriceAfterDiscount = null;
 
+    #[ApiProperty(writable: false, security: 'is_granted("ROLE_ADMIN")')]
+    public bool $isAdmin = true;
+
 }

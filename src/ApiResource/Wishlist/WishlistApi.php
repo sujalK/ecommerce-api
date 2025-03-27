@@ -27,11 +27,13 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName: 'Wishlist',
     description: 'Wishlist of a User',
     operations: [
-        new Get(),
+        new Get (
+            security: 'is_granted("VIEW", object)'
+        ),
         new GetCollection(),
         new Post(
             validationContext: ['groups' => ['Default', 'postValidation']],
-            processor: CreateWishlistStateProcessor::class,
+            // processor: CreateWishlistStateProcessor::class,
         ),
         new Delete(
             security: 'is_granted("DELETE", object)',
@@ -40,7 +42,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     paginationItemsPerPage: 10,
     security: 'is_granted("ROLE_USER")',
     provider: EntityToDtoStateProvider::class,
-    // processor: DtoToEntityStateProcessor::class,
     processor: WishlistStateProcessor::class,
     stateOptions: new Options(entityClass: Wishlist::class)
 )]
@@ -51,7 +52,6 @@ class WishlistApi
     public ?int $id                       = null;
 
     #[ApiProperty(readable: false, writable: false)]
-    #[IsValidOwner]
     public ?UserApi $ownedBy              = null;
 
     #[Assert\NotBlank(groups: ['postValidation'])]

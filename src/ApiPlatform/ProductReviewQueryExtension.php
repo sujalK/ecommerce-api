@@ -29,6 +29,11 @@ class ProductReviewQueryExtension implements QueryCollectionExtensionInterface, 
 
     public function applyToItem(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, array $identifiers, ?Operation $operation = null, array $context = []): void
     {
+        // If it's a GET operation, then let security handle it, by throwing 403 Forbidden instead of returning a 404
+        if (str_ends_with($operation->getName(), '_get')) {
+            return;
+        }
+
         $this->addAndWhere($resourceClass, $queryBuilder);
     }
 
@@ -38,12 +43,27 @@ class ProductReviewQueryExtension implements QueryCollectionExtensionInterface, 
             return;
         }
 
+        if ($this->security->isGranted('ROLE_ADMIN')) {
+            return;
+        }
+
         /** @var User $user */
         $user = $this->security->getUser();
 
         $rootAlias = $queryBuilder->getRootAliases()[0];
 
-        $queryBuilder->andWhere(\sprintf('%s.owner = :owner', $rootAlias))
-                     ->setParameter('owner', $user);
+        if ($user) {
+            // for logged-in user
+            $queryBuilder->andWhere(\sprintf('%s.owner = :owner OR %s.isActive = :isActive', $rootAlias, $rootAlias))
+                ->setParameter('owner', $user)
+                ->setParameter('isActive', true)
+            ;
+        } else {
+            // for not logged-in user
+            $queryBuilder->andWhere(\sprintf('%s.isActive = :isActive', $rootAlias))
+                ->setParameter('isActive', true)
+            ;
+        }
+
     }
 }

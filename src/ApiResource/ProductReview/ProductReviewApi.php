@@ -22,6 +22,7 @@ use App\Entity\User;
 use App\State\DtoToEntityStateProcessor;
 use App\State\EntityToDtoStateProvider;
 use App\State\ProductReviewStateProcessor;
+use App\Validator\CannotChangeProduct;
 use App\Validator\CanPostReview;
 use App\Validator\IsValidProduct;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -30,10 +31,13 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName: 'ProductReview',
     description: 'Review of a Product',
     operations: [
-        new Get (),
+        new Get (
+            security: 'object.isActive or ( user !== null and ( object.owner.id === user.getId() or is_granted("ROLE_ADMIN") ) )',
+        ),
         new GetCollection(),
         new Patch (
-            security: 'is_granted("EDIT_REVIEW", object)'
+            security: 'is_granted("EDIT_REVIEW", object)',
+            validationContext: ['groups' => ['Default', 'patchValidation']]
         ),
         new Post (
             security: 'is_granted("ROLE_USER")',
@@ -63,7 +67,8 @@ use Symfony\Component\Validator\Constraints as Assert;
     stateOptions: new Options(entityClass: ProductReview::class)
 )]
 #[ApiFilter(SearchFilter::class, properties: ['owner.id' => 'exact'])]
-#[CanPostReview]
+#[CanPostReview(groups: ['postValidation'])]
+#[CannotChangeProduct(groups: ['patchValidation'])]
 class ProductReviewApi
 {
 

@@ -46,10 +46,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $lastName = null;
 
     #[ORM\Column]
-    private ?bool $accountActiveStatus = null;
+    private ?bool $isActive = null;
 
     #[ORM\Column]
-    private ?bool $verificationStatus = null;
+    private ?bool $isVerified = null;
 
     public ?array $accessTokenScopes = null;
 
@@ -203,29 +203,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getAccountActiveStatus(): ?bool
-    {
-        return $this->accountActiveStatus;
-    }
+//    public function getAccountActiveStatus(): ?bool
+//    {
+//        return $this->accountActiveStatus;
+//    }
+//
+//    public function setAccountActiveStatus(bool $accountActiveStatus): static
+//    {
+//        $this->accountActiveStatus = $accountActiveStatus;
+//
+//        return $this;
+//    }
 
-    public function setAccountActiveStatus(bool $accountActiveStatus): static
-    {
-        $this->accountActiveStatus = $accountActiveStatus;
-
-        return $this;
-    }
-
-    public function getVerificationStatus(): ?bool
-    {
-        return $this->verificationStatus;
-    }
-
-    public function setVerificationStatus(bool $verificationStatus): static
-    {
-        $this->verificationStatus = $verificationStatus;
-
-        return $this;
-    }
+//    public function getVerificationStatus(): ?bool
+//    {
+//        return $this->verificationStatus;
+//    }
+//
+//    public function setVerificationStatus(bool $verificationStatus): static
+//    {
+//        $this->verificationStatus = $verificationStatus;
+//
+//        return $this;
+//    }
 
     public function getAccessTokenScopes(): ?array
     {
@@ -357,5 +357,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    public function getIsActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(?bool $isActive): void
+    {
+        $this->isActive = $isActive;
+    }
+
+    public function getIsVerified(): ?bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(?bool $isVerified): void
+    {
+        $this->isVerified = $isVerified;
     }
 }

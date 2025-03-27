@@ -1,6 +1,6 @@
 <?php
 
-//declare(strict_types = 1);
+declare(strict_types = 1);
 
 namespace App\ApiPlatform;
 
@@ -12,11 +12,13 @@ use App\Entity\Notification;
 use App\Entity\User;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class NotificationQueryExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
 
     public function __construct (
+        private readonly RequestStack $requestStack,
         private readonly Security $security,
     )
     {
@@ -35,6 +37,13 @@ class NotificationQueryExtension implements QueryCollectionExtensionInterface, Q
     public function AddAndWhere(string $resourceClass, QueryBuilder $queryBuilder): void
     {
         if ($resourceClass !== Notification::class) {
+            return;
+        }
+
+        $currentRequest = $this->requestStack->getCurrentRequest();
+
+        // skip filtering for the PATCH operation, so that 403 forbidden response is returned.
+        if( $currentRequest && $currentRequest->getRealMethod() === 'PATCH') {
             return;
         }
 

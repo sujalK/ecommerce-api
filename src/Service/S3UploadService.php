@@ -12,7 +12,7 @@ use Aws\S3\S3Client;
 class S3UploadService implements FileUploaderInterface, S3FileUploaderInterface
 {
 
-    public CONST FILE_PREFIX = 'product_image_';
+    public const string FILE_PREFIX = 'product_image_';
 
     public function __construct (
         private readonly S3Client $s3Client,

@@ -44,19 +44,20 @@ final class ProductVoter extends Voter
 
         switch ($attribute) {
             case self::DELETE:
-
-                if ( ! $this->security->isGranted('ROLE_PRODUCT_DELETE') ) {
-                    return false;
+                // Allow TO DELETE if user has "ROLE_PRODUCT_DELETE" role
+                if ( $this->security->isGranted('ROLE_PRODUCT_DELETE') ) {
+                    return true;
                 }
 
-                return true;
+                return false;
             case self::PATCH:
 
-                if ( ! $this->security->isGranted('ROLE_PRODUCT_EDIT') ) {
-                    return false;
+                // Allow TO EDIT for user having this "ROLE_PRODUCT_EDIT" role
+                if ( $this->security->isGranted('ROLE_PRODUCT_EDIT') ) {
+                    return true;
                 }
 
-                return true;
+                return false;
         }
 
         return false;

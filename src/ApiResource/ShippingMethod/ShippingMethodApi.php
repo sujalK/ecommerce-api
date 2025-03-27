@@ -23,8 +23,12 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName: 'ShippingMethod',
     description: 'Shipping Method',
     operations: [
-        new Get(),
-        new GetCollection(),
+        new Get(
+            security: 'is_granted("PUBLIC_ACCESS")',
+        ),
+        new GetCollection(
+            security: 'is_granted("PUBLIC_ACCESS")',
+        ),
         new Post(
             validationContext: ['groups' => ['Default', 'postValidation']]
         ),

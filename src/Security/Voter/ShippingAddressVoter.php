@@ -37,13 +37,13 @@ final class ShippingAddressVoter extends Voter
             return false;
         }
 
-        assert($user instanceof User);
-        assert($subject instanceof ShippingAddressApi);
-
         // Make sure admin can grant access
         if ($this->security->isGranted('ROLE_ADMIN')) {
             return true;
         }
+
+        assert($user instanceof User);
+        assert($subject instanceof ShippingAddressApi);
 
         switch ($attribute) {
             case self::DELETE:

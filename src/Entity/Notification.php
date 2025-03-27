@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\NotificationRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints\IsNull;
 
 #[ORM\Entity(repositoryClass: NotificationRepository::class)]
 class Notification

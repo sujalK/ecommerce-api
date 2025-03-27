@@ -24,7 +24,9 @@ use Symfony\Component\Validator\Constraints as Assert;
     shortName: 'ShippingAddress',
     description: 'Shipping Address',
     operations: [
-        new Get(),
+        new Get (
+            security: 'user !== null and (object.owner.id === user.getId() or is_granted("ROLE_ADMIN"))'
+        ),
         new GetCollection(),
         new Post (
             validationContext: ['groups' => ['Default', 'postValidation']]
@@ -52,13 +54,13 @@ class ShippingAddressApi
 
     #[Assert\NotBlank(groups: ['postValidation'])]
     #[Assert\Regex(
-        pattern: '/^[a-zA-Z0-9\s\-,.]+$/',
+        pattern: '/^[a-zA-Z0-9\s\-,\.\/]+$/',
         message: 'Address line 1 contains invalid characters.'
     )]
     public ?string $addressLine1          = null;
 
     #[Assert\Regex(
-        pattern: '/^[a-zA-Z0-9\s\-,.]*$/',
+        pattern: '/^[a-zA-Z0-9\s\-,\.]*$/',
         message: 'Address line 2 contains invalid characters.'
     )]
     public ?string $addressLine2          = null;

@@ -21,6 +21,12 @@ final class ProductReviewVoter extends Voter
     public const string EDIT   = 'EDIT_REVIEW';
     public const string DELETE = 'DELETE_REVIEW';
 
+    public function __construct (
+        private readonly Security $security,
+    )
+    {
+    }
+
     protected function supports(string $attribute, mixed $subject): bool
     {
         return in_array($attribute, [self::EDIT, self::DELETE])
@@ -37,6 +43,10 @@ final class ProductReviewVoter extends Voter
         }
         assert($subject instanceof ProductReviewApi);
         assert($user instanceof User);
+
+        if ($this->security->isGranted('ROLE_ADMIN')) {
+            return true;
+        }
 
         // ... (check conditions and return true to grant permission) ...
         switch ($attribute) {

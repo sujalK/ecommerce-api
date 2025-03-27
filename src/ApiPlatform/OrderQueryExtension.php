@@ -12,11 +12,13 @@ use App\Entity\Order;
 use App\Entity\User;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class OrderQueryExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
 
     public function __construct (
+        private readonly RequestStack $requestStack,
         private readonly Security $security,
     )
     {
@@ -35,6 +37,17 @@ class OrderQueryExtension implements QueryCollectionExtensionInterface, QueryIte
     public function addAndWhereUserIdEquals(string $resourceClass, QueryBuilder $queryBuilder): void
     {
         if ($resourceClass !== Order::class) {
+            return;
+        }
+
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request && $request->getRealMethod() === 'GET') {
+            return;
+        }
+
+        // Allow admin to view everything, i.e. do not restrict admin
+        // i.e. skip admin from this filter
+        if ($this->security->isGranted('ROLE_ADMIN')) {
             return;
         }
 

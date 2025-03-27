@@ -52,6 +52,10 @@ class ShippingAddressStateProcessor implements ProcessorInterface
             ]);
         }
 
+        if ($operation instanceof Patch) {
+            $data->updatedAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        }
+
         $entity = $this->processor->process($data, $operation, $uriVariables, $context);
 
         // log
