@@ -15,7 +15,6 @@ use App\Enum\ActivityLog;
 use App\Service\ActivityLogService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 
 class UserStateProcessor implements ProcessorInterface
@@ -28,7 +27,6 @@ class UserStateProcessor implements ProcessorInterface
         private readonly ActivityLogService $activityLogService,
         private readonly MicroMapperInterface $microMapper,
         private readonly EntityManagerInterface $entityManager,
-        private readonly RequestStack $requestStack,
     )
     {
     }
