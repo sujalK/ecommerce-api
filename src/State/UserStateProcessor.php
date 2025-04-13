@@ -14,7 +14,12 @@ use App\Entity\User;
 use App\Enum\ActivityLog;
 use App\Service\ActivityLogService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 
 class UserStateProcessor implements ProcessorInterface
@@ -27,6 +32,10 @@ class UserStateProcessor implements ProcessorInterface
         private readonly ActivityLogService $activityLogService,
         private readonly MicroMapperInterface $microMapper,
         private readonly EntityManagerInterface $entityManager,
+        /* Symfony Mailer to send verification email */
+        private readonly MailerInterface $mailer,
+        #[Autowire('%kernel.project_dir%/assets/QCommerceWelcomeDocument.pdf')]
+        private readonly string $welcomeDocumentPath,
     )
     {
     }
@@ -72,6 +81,25 @@ class UserStateProcessor implements ProcessorInterface
         }
 
         $entity = $this->processor->process($data, $operation, $uriVariables, $context);
+
+        // Create an Email
+        $email = new TemplatedEmail()
+            // we're sending email to specific email address with name
+            ->from(new Address('programmer@gmail.com', 'EcommerceAPI'))
+            // email the registered user ( and we're using Address which is a customer address )
+            ->to(new Address($entity->email, $entity->firstName . ' ' . $entity->lastName))
+            ->subject('Account Confirmation')
+            ->attachFromPath($this->welcomeDocumentPath, 'Welcome Message.pdf', 'application/pdf')
+            ->htmlTemplate('email/account_confirmation.html.twig')
+
+            // we can use context to pass variables to the email template, and no we're not technically rendering a twig template here.
+            // Mailer will do that for us before it sends the email.
+            ->context([
+                'entity' => $entity,
+            ])
+        ;
+
+        $this->mailer->send($email);
 
         // log
         $this->log($operation, $entity);

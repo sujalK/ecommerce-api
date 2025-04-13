@@ -1,0 +1,11 @@
+{% apply inky_to_html|inline_css(source('@styles/foundation-emails.css'), source('@styles/email.css')) %}
+    <container>
+        {% block content %}{% endblock %}
+        <row>
+            <columns>
+                <p>Regards,</p>
+                <p>The Q-Commerce Team</p>
+            </columns>
+        </row>
+    </container>
+{% endapply %}

@@ -1,0 +1,29 @@
+{% extends 'email/layout.html.twig' %}
+
+{% block content %}
+    <row>
+        <spacer size="80"></spacer>
+        <img src="{{ email.image('@images/%s.jpg'|format('q-logo')) }}" alt="logo" style="width: 100px;" class="float-center">
+    </row>
+    <row>
+        <columns>
+            <spacer size="40"></spacer>
+            <h1 class="text-red" style="text-align: center;">
+                Welcome to Q-Commerce !
+            </h1>
+            <p style="text-align: center">Thanks for signing up <b>{{ entity.firstName }}</b>. Please confirm your email address by clicking the button below:</p>
+        </columns>
+    </row>
+    <row>
+        <columns>
+            <p style="text-align: center;">
+                <a href="#" class="rounded center secondary">Confirm Email</a>
+            </p>
+        </columns>
+    </row>
+    <row>
+        <columns>
+            <p>If you didn’t sign up, just ignore this email.</p>
+        </columns>
+    </row>
+{% endblock %}

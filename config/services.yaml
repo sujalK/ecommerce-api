@@ -51,6 +51,13 @@ services:
     App\Service\Product\Patch\ProductImageUpdateService:
         tags: [ 'controller.service_arguments' ]
 
+    # Registering twig extensions
+    Twig\Extra\Inky\InkyExtension:
+        tags: [ 'twig.extension' ]
+
+    Twig\Extra\CssInliner\CssInlinerExtension:
+        tags: ['twig.extension']
+    
 #    App\Validator\CanPostReviewValidator:
 #        tags:
 #            - { name: validator.constraint_validator }
