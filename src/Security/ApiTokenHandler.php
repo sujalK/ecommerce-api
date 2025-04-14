@@ -35,6 +35,14 @@ class ApiTokenHandler implements AccessTokenHandlerInterface
         // get the owner from the token
         $owner = $apiToken->getOwner();
 
+        if (!$owner->getIsActive()) {
+            throw new CustomUserMessageAuthenticationException('Account is inactive. Please contact support for further instructions.');
+        }
+
+        if ($owner->getVerificationToken() !== null || !$owner->getVerifiedAt()) {
+            throw new CustomUserMessageAuthenticationException('Invalid token');
+        }
+
         // set access token scopes to user's property so that getRoles() in User entity utilizes our roles
         $owner->setAccessTokenScopes($apiToken->getScopes());
 

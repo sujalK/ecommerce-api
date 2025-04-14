@@ -12,6 +12,7 @@ use App\Exception\MaxShippingAddressReachedException;
 use App\Exception\MissingOrderItemsException;
 use App\Exception\PendingOrderNotFoundException;
 use Stripe\Exception\ApiErrorException;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -23,10 +24,43 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 class ApiExceptionListener implements EventSubscriberInterface
 {
+
+    public function __construct (
+        private readonly RequestStack $requestStack,
+    )
+    {
+    }
+
     public function onKernelException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
         $response  = null;
+
+        // get the current request
+        $request       = $this->requestStack->getCurrentRequest();
+
+        // get the request method
+        $requestMethod = $request->getRealMethod();
+
+        // During verification
+        if (
+            $requestMethod === 'GET' &&
+            str_contains($request->getUri(), '/user/verify') &&
+            str_contains($exception->getMessage(), 'App\Entity\User')
+        ) {
+
+            // set up the response
+            $response = new JsonResponse([
+                'statusCode' => 400,
+                'error'      => 'Invalid request',
+                'message'    => 'Bad Request',
+            ], 400);
+
+            // set response
+            $event->setResponse($response);
+
+            return;
+        }
 
         /*
          * For HttpException, for non-authenticated user

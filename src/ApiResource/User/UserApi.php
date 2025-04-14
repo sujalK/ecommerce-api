@@ -125,6 +125,11 @@ class UserApi
     #[ApiProperty(readable: true, writable: false)]
     public ?bool $isVerified          = false;
 
+    #[ApiProperty(readable: false, writable: false)]
+    public ?string $verificationToken = null;
+
+    #[ApiProperty(readable: false, writable: false)]
+    public ?\DateTimeImmutable $verifiedAt = null;
 
 //    #[ApiProperty(writable: false)]
 //    public ?array $carts              = null;

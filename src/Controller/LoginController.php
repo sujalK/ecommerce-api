@@ -30,10 +30,18 @@ class LoginController extends AbstractController
             ], 401);
         }
 
-        if ( ! $user->getVerificationStatus() ) {
+        // if user is not active then also do not allow to log in into the system
+        if (!$user->getIsActive()) {
+            return $this->json([
+                'error' => 'Account is inactive. Please contact support for further instructions.'
+            ], 401);
+        }
+
+        // If there is verification token still, then user is not authenticated
+        if ( $user->getVerificationToken() !== null || !$user->getVerifiedAt() ) {
             return $this->json([
                 'account_verification' => 'Please make sure that your account is verified before logging in',
-            ]);
+            ], 401);
         }
 
         // create token

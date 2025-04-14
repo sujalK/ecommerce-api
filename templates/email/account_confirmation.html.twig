@@ -3,22 +3,30 @@
 {% block content %}
     <row>
         <spacer size="80"></spacer>
-        <img src="{{ email.image('@images/%s.jpg'|format('q-logo')) }}" alt="logo" style="width: 100px;" class="float-center">
+        <img
+            src="{{ email.image('@images/%s.png'|format('q-logo')) }}"
+            alt="logo"
+            style="width: 100px;"
+            class="small-float-left float-center small-margin-bottom"
+        >
     </row>
     <row>
         <columns>
             <spacer size="40"></spacer>
+            <h1 style="text-align: center; color: #EE204D;">
+                👋 Hi {{ entity.firstName }},
+            </h1>
             <h1 class="text-red" style="text-align: center;">
                 Welcome to Q-Commerce !
             </h1>
-            <p style="text-align: center">Thanks for signing up <b>{{ entity.firstName }}</b>. Please confirm your email address by clicking the button below:</p>
+            <p style="text-align: center">Thank you for signing up. Please confirm your email address before signing in.</p>
         </columns>
     </row>
     <row>
         <columns>
-            <p style="text-align: center;">
-                <a href="#" class="rounded center secondary">Confirm Email</a>
-            </p>
+            <center>
+                <button href="{{ url('app_user_verify', { token : entity.verificationToken }) }}" class="button primary rounded center">Confirm Email</button>
+            </center>
         </columns>
     </row>
     <row>

@@ -64,6 +64,14 @@ class UserStateProcessor implements ProcessorInterface
             if ($operation instanceof Post) {
                 // we can set default roles here
                 $data->roles = [];
+
+                // set verification token
+                $data->verificationToken = bin2hex(random_bytes(32));
+
+                // Initially, set isActive to true for new users
+                $data->isActive = true;
+
+
             } else if (isset($data->roles)) {
                 $data->roles = [];
             }
@@ -82,24 +90,27 @@ class UserStateProcessor implements ProcessorInterface
 
         $entity = $this->processor->process($data, $operation, $uriVariables, $context);
 
-        // Create an Email
-        $email = new TemplatedEmail()
-            // we're sending email to specific email address with name
-            ->from(new Address('programmer@gmail.com', 'EcommerceAPI'))
-            // email the registered user ( and we're using Address which is a customer address )
-            ->to(new Address($entity->email, $entity->firstName . ' ' . $entity->lastName))
-            ->subject('Account Confirmation')
-            ->attachFromPath($this->welcomeDocumentPath, 'Welcome Message.pdf', 'application/pdf')
-            ->htmlTemplate('email/account_confirmation.html.twig')
+        // if user is created then send email to verify the account
+        if (isset($entity->email) && !$this->security->isGranted('ROLE_ADMIN') && $operation instanceof Post ) {
+            // Create an Email
+            $email = new TemplatedEmail()
+                // we're sending email to specific email address with name
+                ->from(new Address('programmer@gmail.com', 'EcommerceAPI'))
+                // email the registered user ( and we're using Address which is a customer address )
+                ->to(new Address($entity->email, $entity->firstName . ' ' . $entity->lastName))
+                ->subject('Account Confirmation')
+                ->attachFromPath($this->welcomeDocumentPath, 'Welcome Message.pdf', 'application/pdf')
+                ->htmlTemplate('email/account_confirmation.html.twig')
 
-            // we can use context to pass variables to the email template, and no we're not technically rendering a twig template here.
-            // Mailer will do that for us before it sends the email.
-            ->context([
-                'entity' => $entity,
-            ])
-        ;
+                // we can use context to pass variables to the email template, and no we're not technically rendering a twig template here.
+                // Mailer will do that for us before it sends the email.
+                ->context([
+                    'entity' => $entity,
+                ])
+            ;
 
-        $this->mailer->send($email);
+            $this->mailer->send($email);
+        }
 
         // log
         $this->log($operation, $entity);

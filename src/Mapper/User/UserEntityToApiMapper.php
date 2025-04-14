@@ -40,6 +40,8 @@ class UserEntityToApiMapper implements MapperInterface
         $dto->isActive   = $entity->getIsActive();
         $dto->isVerified = $entity->getIsVerified();
         $dto->roles      = $entity->getRoles();
+        $dto->verificationToken = $entity->getVerificationToken();
+        $dto->verifiedAt = $entity->getVerifiedAt();
 
 //        $dto->carts               = $entity->getCarts();
 //        $dto->shippingAddresses   = $entity->getShippingAddresses();
