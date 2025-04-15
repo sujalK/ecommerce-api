@@ -94,16 +94,11 @@ class UserStateProcessor implements ProcessorInterface
         if (isset($entity->email) && !$this->security->isGranted('ROLE_ADMIN') && $operation instanceof Post ) {
             // Create an Email
             $email = new TemplatedEmail()
-                // we're sending email to specific email address with name
                 ->from(new Address('programmer@gmail.com', 'EcommerceAPI'))
-                // email the registered user ( and we're using Address which is a customer address )
                 ->to(new Address($entity->email, $entity->firstName . ' ' . $entity->lastName))
                 ->subject('Account Confirmation')
                 ->attachFromPath($this->welcomeDocumentPath, 'Welcome Message.pdf', 'application/pdf')
                 ->htmlTemplate('email/account_confirmation.html.twig')
-
-                // we can use context to pass variables to the email template, and no we're not technically rendering a twig template here.
-                // Mailer will do that for us before it sends the email.
                 ->context([
                     'entity' => $entity,
                 ])
