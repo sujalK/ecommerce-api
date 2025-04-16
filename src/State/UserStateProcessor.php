@@ -17,6 +17,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
@@ -94,7 +96,6 @@ class UserStateProcessor implements ProcessorInterface
         if (isset($entity->email) && !$this->security->isGranted('ROLE_ADMIN') && $operation instanceof Post ) {
             // Create an Email
             $email = new TemplatedEmail()
-                ->from(new Address('programmer@gmail.com', 'EcommerceAPI'))
                 ->to(new Address($entity->email, $entity->firstName . ' ' . $entity->lastName))
                 ->subject('Account Confirmation')
                 ->attachFromPath($this->welcomeDocumentPath, 'Welcome Message.pdf', 'application/pdf')
@@ -103,6 +104,12 @@ class UserStateProcessor implements ProcessorInterface
                     'entity' => $entity,
                 ])
             ;
+
+            // set up the category ( tag ) for the Mailtrap to filter for statistics related usages
+            $email->getHeaders()->add(new TagHeader('account_confirmation_email'));
+
+            $email->getHeaders()->add(new MetadataHeader('user_id', (string) $entity->id));
+            $email->getHeaders()->add(new MetadataHeader('email', $entity->email));
 
             $this->mailer->send($email);
         }

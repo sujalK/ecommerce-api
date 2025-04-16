@@ -12,6 +12,8 @@ parameters:
     upload_max_filesize: '%env(int:UPLOAD_MAX_FILESIZE)%'
     upload_max_filesize_admin: '%env(int:UPLOAD_MAX_FILESIZE_ADMIN)%'
 
+    global_from_email: '%env(FROM_EMAIL)%'
+
 services:
     # default configuration for services in *this* file
     _defaults:
