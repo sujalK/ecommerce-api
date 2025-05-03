@@ -1,0 +1,6 @@
+workers:
+    # it lets us define processes to run in the background when we start the server.
+    messenger:
+        # this solves the issue of needing to keep running in a separate terminal window ( i.e. the below command we used to run on a separate window )
+        cmd: ['symfony', 'console', 'messenger:consume', 'async']
+        watch: ['config', 'src', 'templates']

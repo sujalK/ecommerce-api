@@ -1,0 +1,34 @@
+{% extends 'email/layout.html.twig' %}
+
+{% block content %}
+    <row>
+        <spacer size="80"></spacer>
+        <img
+                src="{{ email.image('@images/%s.png'|format('q-logo')) }}"
+                alt="logo"
+                style="width: 100px;"
+                class="small-float-left float-center small-margin-bottom"
+        >
+    </row>
+    <row>
+        <columns>
+            <spacer size="40"></spacer>
+            <h1 style="text-align: center; color: #EE204D;">
+                👋 Hi {{ cart.owner.firstName|capitalize }},
+            </h1>
+            <p style="text-align: center">It seems that you forget to place the order during shopping, please visit our store to continue shopping.</p>
+        </columns>
+    </row>
+    <row>
+        <columns>
+            <center>
+                <button href="{{ url('app_homepage') }}" class="button primary rounded center">Continue Shopping</button>
+            </center>
+        </columns>
+    </row>
+    <row>
+        <columns>
+            <p>Happy shopping!</p>
+        </columns>
+    </row>
+{% endblock %}

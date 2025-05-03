@@ -2,7 +2,17 @@ framework:
     router:
         # Configure how to generate URLs in non-HTTP contexts, such as CLI commands.
         # See https://symfony.com/doc/current/routing.html#generating-urls-in-commands
-        #default_uri: http://localhost
+        default_uri: https://ecommerce-api-service.example
+
+when@dev:
+    parameters:
+        # setting up parameter so that by default it uses this default one.
+        env(SYMFONY_PROJECT_DEFAULT_ROUTE_URL): 'http://localhost'
+
+    framework:
+        router:
+            # the default URI for the development environment
+            default_uri: '%env(SYMFONY_PROJECT_DEFAULT_ROUTE_URL)%'
 
 when@prod:
     framework:

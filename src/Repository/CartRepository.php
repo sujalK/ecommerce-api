@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Repository;
 
 use App\Entity\Cart;
@@ -31,6 +33,21 @@ class CartRepository extends ServiceEntityRepository
         }
 
         return $cart;
+    }
+
+    /**
+     * @return iterable<Cart>
+     */
+    public function findCartsToRemind(): iterable
+    {
+        return $this->createQueryBuilder('c')
+                    ->andWhere('c.status = :status')
+                    ->andWhere('c.reminderSentAt IS NULL')
+                    ->andWhere('c.createdAt < :cutoff')
+                    ->setParameter('status', 'active')
+                    ->setParameter('cutoff', new \DateTimeImmutable('-24 hours'))
+                    ->getQuery()
+                    ->toIterable();
     }
 
     //    /**

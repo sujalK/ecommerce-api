@@ -39,7 +39,7 @@ class ApiTokenHandler implements AccessTokenHandlerInterface
             throw new CustomUserMessageAuthenticationException('Account is inactive. Please contact support for further instructions.');
         }
 
-        if ($owner->getVerificationToken() !== null || !$owner->getVerifiedAt()) {
+        if ($owner->getVerificationToken() !== null || !$owner->getIsVerified()) {
             throw new CustomUserMessageAuthenticationException('Invalid token');
         }
 
