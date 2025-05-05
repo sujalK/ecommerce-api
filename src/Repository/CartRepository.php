@@ -43,7 +43,7 @@ class CartRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('c')
                     ->andWhere('c.status = :status')
                     ->andWhere('c.reminderSentAt IS NULL')
-                    ->andWhere('c.createdAt < :cutoff')
+                    ->andWhere('c.createdAt <= :cutoff')
                     ->setParameter('status', 'active')
                     ->setParameter('cutoff', new \DateTimeImmutable('-24 hours'))
                     ->getQuery()
