@@ -4,17 +4,15 @@ declare(strict_types = 1);
 
 namespace App\Command;
 
+use App\Email\EmailFactory;
 use App\Entity\Cart;
 use App\Repository\CartRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Mailer\Header\MetadataHeader;
-use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\MailerInterface;
 
 #[AsCommand(
@@ -30,6 +28,7 @@ class SendCartRemindersCommand extends Command
         private readonly CartRepository $cartRepository,
         private readonly EntityManagerInterface $em,
         private readonly MailerInterface $mailer,
+        private readonly EmailFactory $emailFactory,
     )
     {
         parent::__construct();
@@ -48,21 +47,7 @@ class SendCartRemindersCommand extends Command
         foreach ($io->progressIterate($carts) as $cart) {
             assert($cart instanceof Cart);
 
-            $userEmailAddress = $cart->getOwner()->getEmail();
-
-            // Send reminder email
-            $email = new TemplatedEmail()
-                ->to($userEmailAddress)
-                ->subject('Shopping Reminder')
-                ->htmlTemplate('email/cart_reminder.html.twig')
-                ->context([
-                    'cart' => $cart,
-                ])
-            ;
-
-            // set up category( tag ) for the Mailtrap to filter for statistics  related usages.
-            $email->getHeaders()->add(new TagHeader('cart_reminder_email'));
-            $email->getHeaders()->add(new MetadataHeader('email', $userEmailAddress));
+            $email = $this->emailFactory->createCartReminderEmail($cart);
 
             $this->mailer->send($email);
 

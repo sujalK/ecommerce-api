@@ -10,18 +10,13 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\User\UserApi;
+use App\Email\EmailFactory;
 use App\Entity\User;
 use App\Enum\ActivityLog;
 use App\Service\ActivityLogService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\Mailer\Header\MetadataHeader;
-use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\Email;
 use Symfonycasts\MicroMapper\MicroMapperInterface;
 
 class UserStateProcessor implements ProcessorInterface
@@ -36,8 +31,7 @@ class UserStateProcessor implements ProcessorInterface
         private readonly EntityManagerInterface $entityManager,
         /* Symfony Mailer to send verification email */
         private readonly MailerInterface $mailer,
-        #[Autowire('%kernel.project_dir%/assets/QCommerceWelcomeDocument.pdf')]
-        private readonly string $welcomeDocumentPath,
+        private readonly EmailFactory $emailFactory,
     )
     {
     }
@@ -94,22 +88,8 @@ class UserStateProcessor implements ProcessorInterface
 
         // if user is created then send email to verify the account
         if (isset($entity->email) && !$this->security->isGranted('ROLE_ADMIN') && $operation instanceof Post ) {
-            // Create an Email
-            $email = new TemplatedEmail()
-                ->to(new Address($entity->email, $entity->firstName . ' ' . $entity->lastName))
-                ->subject('Account Confirmation')
-                ->attachFromPath($this->welcomeDocumentPath, 'Welcome Message.pdf', 'application/pdf')
-                ->htmlTemplate('email/account_confirmation.html.twig')
-                ->context([
-                    'entity' => $entity,
-                ])
-            ;
-
-            // set up the category ( tag ) for the Mailtrap to filter for statistics related usages
-            $email->getHeaders()->add(new TagHeader('account_confirmation_email'));
-
-            $email->getHeaders()->add(new MetadataHeader('user_id', (string) $entity->id));
-            $email->getHeaders()->add(new MetadataHeader('email', $entity->email));
+            // Create email
+            $email = $this->emailFactory->createAccountConfirmationEmail($entity);
 
             $this->mailer->send($email);
         }
