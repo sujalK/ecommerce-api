@@ -1,0 +1,6 @@
+framework:
+    webhook:
+        routing:
+            # type used in the URL
+            mailtrap:
+                service: mailer.webhook.request_parser.mailtrap
