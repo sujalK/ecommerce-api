@@ -1,9 +1,0 @@
-Packages required:
-------------------
-> composer require api
-> composer require orm
-> composer require maker
-> composer require --dev zenstruck/foundry
-> composer require zenstruck/browser --dev
-> composer require --dev orm-fixtures
-> 
