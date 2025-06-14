@@ -8,6 +8,24 @@ Programming language: `PHP`
 
 Frameworks: `Symfony`, `API Platform`
 
+> #### Project type
+`REST API`
+
+<br />
+
+> #### Features Highlights
+- Stripe Payment integration
+- File upload to AWS S3
+- Mailtrap and Symfony mailer to send emails
+- Custom state providers and processors
+- Token-based authentication
+- Coupon system
+- Custom validators
+- Custom exception listener
+- Voters
+- Query Extension
+and more...
+
 ## Setting up 
 This repository holds the code for API of ecommerce store developed
 using API Platform Version 4, and Symfony Version 7.
