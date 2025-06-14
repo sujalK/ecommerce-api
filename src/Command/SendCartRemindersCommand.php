@@ -14,11 +14,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Scheduler\Attribute\AsCronTask;
 
 #[AsCommand(
     name: 'app:send-cart-reminders',
     description: 'Send cart reminder emails',
 )]
+#[AsCronTask('# # * * *')]
 class SendCartRemindersCommand extends Command
 {
 

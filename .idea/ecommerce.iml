@@ -173,6 +173,8 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/zenstruck/console-test" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/remote-event" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/webhook" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/dragonmantank/cron-expression" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/scheduler" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

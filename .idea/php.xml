@@ -188,6 +188,8 @@
       <path value="$PROJECT_DIR$/vendor/zenstruck/console-test" />
       <path value="$PROJECT_DIR$/vendor/symfony/remote-event" />
       <path value="$PROJECT_DIR$/vendor/symfony/webhook" />
+      <path value="$PROJECT_DIR$/vendor/symfony/scheduler" />
+      <path value="$PROJECT_DIR$/vendor/dragonmantank/cron-expression" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.4">
