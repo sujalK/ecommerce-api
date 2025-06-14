@@ -47,7 +47,6 @@ class AccountCreationResourceTest extends KernelTestCase
 
         $this->mailer()
              ->assertSentEmailCount(1)
-             // ->assertEmailSentTo('ksujan413@gmail.com', 'Account Confirmation')
              ->assertEmailSentTo('test@test.com', function (TestEmail $email) {
                  $email
                      ->assertSubject('Account Confirmation')

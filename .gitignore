@@ -9,6 +9,7 @@
 /var/
 /vendor/
 /.idea
+/0_requirements
 ###< symfony/framework-bundle ###
 
 ###> symfony/phpunit-bridge ###
