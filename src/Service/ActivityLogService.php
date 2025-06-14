@@ -59,7 +59,6 @@ class ActivityLogService
 
     public function storeLog(ActivityLogEnum $log, ?object $object = null): void
     {
-        dd($this->requestStack);
         $object ??= new \stdClass();
         
         $description = $this->activityLogFormatter->getDescription(
