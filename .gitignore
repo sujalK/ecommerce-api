@@ -8,7 +8,6 @@
 /public/bundles/
 /var/
 /vendor/
-.env.test
 ###< symfony/framework-bundle ###
 
 ###> symfony/phpunit-bridge ###
