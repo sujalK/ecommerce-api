@@ -22,7 +22,7 @@ class PersistenceService implements PersistenceServiceInterface
             $this->entityManager->persist($entity);
         }
 
-        $this->flush();
+        $this->entityManager->flush();
     }
 
     public function persist(object $object): void
