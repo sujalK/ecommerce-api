@@ -30,6 +30,13 @@ class LoginController extends AbstractController
             ], 401);
         }
 
+        // if user is not verified, then
+        if (!$user->getIsVerified()) {
+            return $this->json([
+                'error' => 'User is not verified. Please verify your email.'
+            ], 401);
+        }
+
         // if user is not active then also do not allow to log in into the system
         if (!$user->getIsActive()) {
             return $this->json([
