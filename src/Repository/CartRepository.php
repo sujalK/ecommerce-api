@@ -41,6 +41,8 @@ class CartRepository extends ServiceEntityRepository
     public function findCartsToRemind(): iterable
     {
         return $this->createQueryBuilder('c')
+                    ->leftJoin('c.owner', 'u')
+                    ->addSelect('u')
                     ->andWhere('c.status = :status')
                     ->andWhere('c.reminderSentAt IS NULL')
                     ->andWhere('c.createdAt <= :cutoff')
